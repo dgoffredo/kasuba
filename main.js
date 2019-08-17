@@ -1,92 +1,53 @@
-var config = {
-    type: Phaser.AUTO,
-    // type: Phaser.CANVAS,
-    width: 800,
-    height: 600,
-    physics: {
-        default: 'matter',
-        // arcade: {
-        //     gravity: { y: 200 }
-        // },
-        matter: {
-            gravity: { y: 1 },
-            setBounds: {
-                width: 800,
-                height: 600
-            }
-        }
-    },
-    scene: {
-        preload: preload,
-        create: create
+Stage(function(stage) {
+    const Mouse = Stage.Mouse;
+
+    stage.viewbox(400, 100);
+
+    const colors = ['green', 'blue', 'purple', 'red', 'orange', 'yellow'];
+
+    const row = Stage.row(0.5).appendTo(stage).pin('align', 0.5).spacing(10);
+
+    function scale(node, amount) {
+        const durationMs = 250;
+
+        return node.tween(durationMs)
+            .pin({scaleX: amount, scaleY: amount})
+            .ease('bounce-in');
     }
-};
 
-var game = new Phaser.Game(config);
+    function expand(image) {
+        return scale(image, 1.5);
+    }
 
-function preload() {
-    // this.load.setBaseURL('http://labs.phaser.io');
+    function shrink(image) {
+        return scale(image, 1.0);
+    }
 
-    this.load.image('sky', 'assets/skies/space3.png');
-    this.load.image('logo', 'assets/sprites/phaser3-logo.png');
-    this.load.image('red', 'assets/particles/red.png');
-}
+    let selectedImage;
 
-function create() {
-    this.add.image(400, 300, 'sky');
+    colors.forEach(color => {
+        const box = Stage.image('blank').appendTo(row);
 
-    var particles = this.add.particles('red');
+        Stage.image(color)
+            .appendTo(box)
+            .pin('align', 0.5)
+            .on(Mouse.CLICK, function(point) {
+                console.log(point);
+                console.log(this);
 
-    var emitter = particles.createEmitter({
-        speed: 200,
-        scale: { start: 1, end: 0 },
-        blendMode: 'ADD'
+                if (selectedImage === this) {
+                    shrink(this);
+                    selectedImage = undefined;
+                }
+                else {
+                    if (selectedImage !== undefined) {
+                        shrink(selectedImage);
+                    }
+                    expand(this);
+                    selectedImage = this;
+                }
+
+                return true;
+            });
     });
-
-    console.log(this);
-    console.log(this.matter);
-    // var logo = this.physics.add.image(400, 100, 'logo');
-    var logo = this.matter.add.image(400, 100, 'logo');
-    // var logo = this.add.image(400, 100, 'logo');
-
-    // logo.setVelocity(100, 200);
-    logo.setBounce(2);
-    // logo.setFrictionAir(0.01);
-    // logo.setCollideWorldBounds(true);
-    // logo.setFriction(100);
-
-    emitter.startFollow(logo);
-    const game = this.game;
-    const scene = this;
-    let counter = 0;
-
-    this.events.on('update', function(time, delta) {
-        ++counter;
-        if (counter <= 3) {
-            console.log(time, delta);
-            console.log(game.scene.keys);
-            console.log(game.textures.list);
-        }
-        if (counter == 180) {
-            // Object.values(game.textures.list).forEach(texture => texture.dirty = false);
-
-            // scene.scene.sleep();
-
-            // scene.scene.pause();
-
-            // game.loop.raf.stop();
-            // game.loop.running = false;
-
-            // game.loop.stop();
-
-            // game.loop.sleep();
-
-            // game.loop.pause();
-
-            // game.scene.pause('default');
-
-            // const removeCanvas = false;
-            // game.destroy(removeCanvas);
-        }
-    });
-}
+});
