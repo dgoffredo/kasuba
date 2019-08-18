@@ -3,9 +3,20 @@ Stage(function(stage) {
 
     stage.viewbox(400, 100);
 
-    const colors = ['green', 'blue', 'purple', 'red', 'orange', 'yellow'];
+    const colors = ['green', 'blue', 'orange'];
+    const spacing = 30;
 
-    const row = Stage.row(0.5).appendTo(stage).pin('align', 0.5).spacing(10);
+    const column =
+        Stage.column(0.5).appendTo(stage).pin('align', 0.5).spacing(spacing);
+
+    let turns = 0;
+
+    setInterval(() => {
+        ++turns;
+        column.tween(2000)
+              .pin({rotation: turns * Math.PI / 2})
+              .ease('elastic-in');
+    }, 3000);
 
     function scale(node, amount) {
         const durationMs = 250;
@@ -16,7 +27,7 @@ Stage(function(stage) {
     }
 
     function expand(image) {
-        return scale(image, 1.5);
+        return scale(image, 1.2);
     }
 
     function shrink(image) {
@@ -25,29 +36,38 @@ Stage(function(stage) {
 
     let selectedImage;
 
-    colors.forEach(color => {
-        const box = Stage.image('blank').appendTo(row);
+    colors.forEach(() => {
+        const row =
+            Stage.row(0.5).appendTo(column).spacing(spacing);
 
-        Stage.image(color)
-            .appendTo(box)
-            .pin('align', 0.5)
-            .on(Mouse.CLICK, function(point) {
-                console.log(point);
-                console.log(this);
+        colors.forEach(color => {
+            const box = Stage.image('blank').appendTo(row);
 
-                if (selectedImage === this) {
-                    shrink(this);
-                    selectedImage = undefined;
-                }
-                else {
-                    if (selectedImage !== undefined) {
-                        shrink(selectedImage);
+            Stage.image(color)
+                .appendTo(box)
+                .pin('align', 0.5)
+                .on(Mouse.CLICK, function(point) {
+                    console.log(point);
+                    console.log(this);
+
+                    if (selectedImage === this) {
+                        shrink(this);
+                        selectedImage = undefined;
                     }
-                    expand(this);
-                    selectedImage = this;
-                }
+                    else {
+                        if (selectedImage !== undefined) {
+                            shrink(selectedImage);
+                        }
+                        expand(this);
+                        selectedImage = this;
+                    }
 
-                return true;
-            });
+                    // testing to see what this does
+                    this.remove();
+                    this.appendTo(box);
+
+                    return true;
+                });
+        });
     });
 });
