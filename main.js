@@ -129,20 +129,20 @@ Stage(function(stage) {
         //     offsetY: spacing * row    - shear * depth + spacing,
         //     scale:   1 - perspective * depth
         //
-        /*
         const heightScale = 1 - (2 - row) * 0.1;
         const shadowPosition = {
             // It's the scaling that's doing it!
-            offsetY: cellPosition({row: 0, column, depth}).offsetY + spacing * (2 - row),
-            scaleY:  0.5 * heightScale,
-            scaleX:  heightScale
+            // offsetY: cellPosition({row: 0, column, depth}).offsetY + spacing * (2 - row),
+            offsetY: spacing * (2 - row) + 0.5 * spacing,
+            offsetX: shear,
+            scaleY:  0.5 * heightScale * cellScale(depth),
+            scaleX:  heightScale * cellScale(depth)
         };
 
-        Stage.image(['red', 'green', 'blue'][row])
+        Stage.image('dark')
              .appendTo(cell)
              .pin(shadowPosition)
              .pin({skewX: -1});
-        */
 
         // The visible part of the cell.
         const cellFill = Stage.image('blue')
