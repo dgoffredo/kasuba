@@ -1,9 +1,9 @@
 Stage({
     name: 'example',
-    image: {src: 'assets/example2.png', ratio: 4},
+    image: {src: 'assets/example3.png', ratio: 4},
     trim: 0.2,
     textures: {
-        dark: {x: 0 * 16, y: 0, width: 16, height: 16},
+        shadow: {x: 0 * 16, y: 0, width: 16, height: 16},
         light: {x: 1 * 16, y: 0, width: 16, height: 16},
         blue: {x: 2 * 16, y: 0, width: 16, height: 16},
         purple: {x: 3 * 16, y: 0, width: 16, height: 16},
@@ -14,7 +14,6 @@ Stage({
         blank: {x: 7 * 16, y: 16, width: 16, height: 16},
 
         rainbow: [
-            'dark',
             'light',
             'blue',
             'purple',
@@ -47,6 +46,7 @@ Stage({
             left: 4,
             right: 4
         },
-        circle: {x: 16, y: 32, width: 16, height: 16}
+        circle: {x: 16, y: 32, width: 16, height: 16},
+        floor: {x: 32, y: 32, width: 64, height: 64}
     }
 });

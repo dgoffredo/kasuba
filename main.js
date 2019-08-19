@@ -97,16 +97,14 @@ Stage(function(stage) {
                       .stretch();
 
     // TODO: have an optional "floor" with shadows, to aid perspective.
-    /*
-    const floor = Stage.image('dark').appendTo(cube)
+    const floor = Stage.image('floor').appendTo(cube)
                        .pin({width: 135,
                              textureAlpha: 0.5,
-                             offsetY: 120,
-                             offsetX: -20,
+                             offsetY: 2.7 * spacing,
+                             // offsetX: -20,
                              height: 55,
-                             skewX: -0.9})
+                             skewX: -0.85})
                        .stretch();
-                       */
 
     for (let {row, column, depth} of coordinates()) {
         const position = cellPosition({row, column, depth});
@@ -139,7 +137,7 @@ Stage(function(stage) {
             scaleX:  heightScale * cellScale(depth)
         };
 
-        Stage.image('dark')
+        Stage.image('shadow')
              .appendTo(cell)
              .pin(shadowPosition)
              .pin({skewX: -1});
