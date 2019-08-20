@@ -3,6 +3,110 @@ Stage(function(stage) {
 
     stage.viewbox(720 / 4, 1280 / 4);
 
+    const table = Stage.column().appendTo(stage).spacing(10);
+
+    const controls = Stage.row().appendTo(table).spacing(10);
+
+    let   cells   = [];
+    let   shadows = [];
+    let   floor;
+    const floorAlpha = 0.1;
+    const hitboxWidth = 48;
+    const hitboxHeight = 16;
+
+    function toggle(onEnable, onDisable, initial = false) {
+        let state = initial;
+        return function () {
+            if (state) {
+                state = false;
+                return onDisable();
+            }
+            else {
+                state = true;
+                return onEnable();
+            }
+        }
+    }
+
+    Stage.string('letter').value('A')
+         .appendTo(controls)
+         .on(Mouse.CLICK, toggle(function () {
+                                     cells.forEach(function (cell) {
+                                         cell.last().image('blue');
+                                     });
+                                     return true;
+                                 },
+                                 function () {
+                                     cells.forEach(function (cell) {
+                                         cell.last().image('blue box');
+                                     });
+                                     return true;
+                                 }));
+
+
+    Stage.string('letter').value('B')
+         .appendTo(controls)
+         .on(Mouse.CLICK, function () {
+             const skipBrowserCache = true;
+             location.reload(skipBrowserCache);
+             return true;
+         });
+
+    function invokeMethod(methodName, ...args) {
+        return function (instance) {
+            instance[methodName](...args);
+        };
+    }
+
+    Stage.string('letter').value('C')
+         .appendTo(controls)
+         .on(Mouse.CLICK, toggle(function () {
+                                     shadows.forEach(invokeMethod('hide'));
+                                     floor.hide();
+                                     return true;
+                                 },
+                                 function () {
+                                     shadows.forEach(invokeMethod('show'));
+                                     floor.show();
+                                     return true;
+                                 }));
+
+    Stage.string('letter').value('D')
+         .appendTo(controls)
+         .on(Mouse.CLICK, toggle(function () {
+                                     cells.forEach(function (cell) {
+                                         cell.pin({textureAlpha: 0.5});
+                                     });
+                                     return true;
+                                 },
+                                 function () {
+                                     cells.forEach(function (cell) {
+                                         cell.pin({textureAlpha: 0});
+                                     });
+                                     return true;
+                                }));
+ 
+    Stage.string('letter').value('E')
+         .appendTo(controls)
+         .on(Mouse.CLICK, toggle(function () {
+                                     shadows.forEach(function (cell) {
+                                         cell.pin({textureAlpha: 0.3});
+                                     });
+                                     return true;
+                                 },
+                                 function () {
+                                     shadows.forEach(function (cell) {
+                                         cell.pin({textureAlpha: 0});
+                                     });
+                                     return true;
+                                }));
+                                
+    Stage.string('letter').value('F')
+         .appendTo(controls)
+         .on(Mouse.CLICK, 
+             toggle(function () { floor.pin({textureAlpha: 0}); },
+                    function () { floor.pin({textureAlpha: floorAlpha}); }));
+
     // Coordinates are row, column, and depth, each taking on any of the values
     // 0, 1, or 2.  Rows start at the top and go down.  Columns start on the
     // left and go right.  Depth starts at the front and goes back.
@@ -17,13 +121,15 @@ Stage(function(stage) {
     // added to the parent node first.  So, cells are added back to front.
    
     const spacing     = 50;
+    const spacingX    = spacing;
+    const spacingY    = spacing;
     const shear       = 0.32 * spacing;
     const perspective = 0.15;
 
     function cellPosition({row, column, depth}) {
         return {
-            offsetX: spacing * column + shear * depth,
-            offsetY: spacing * row    - shear * depth + spacing,
+            offsetX: spacingX * column + shear * depth,
+            offsetY: spacingY * row    - shear * depth + spacingY,
         };
     }
 
@@ -42,11 +148,11 @@ Stage(function(stage) {
     let selectedImage;
 
     function expand(image, amount) {
-        return scale(image.image('green'), 1.3 * amount);
+        return scale(image.image('green box'), 1.5 * amount);
     }
 
     function shrink(image, amount) {
-        return scale(image.image('blue'), amount);
+        return scale(image.image('blue box'), amount);
     }
 
     function onClick(depth) {
@@ -91,20 +197,20 @@ Stage(function(stage) {
         }
     }
 
-    const cube = Stage.image('blank')
-                      .appendTo(stage)
-                      .pin({align: 0.5, width: 175, height: 200})
+    const cube = Stage.image('purple')
+                      .appendTo(table)
+                      .pin({align: 0.5,
+                            width: 175,
+                            height: 200,
+                            textureAlpha: 0})
                       .stretch();
 
-    // TODO: have an optional "floor" with shadows, to aid perspective.
-    const floor = Stage.image('floor').appendTo(cube)
-                       .pin({width: 135,
-                             textureAlpha: 0.5,
-                             offsetY: 2.7 * spacing,
-                             // offsetX: -20,
-                             height: 55,
-                             skewX: -0.85})
-                       .stretch();
+    floor = Stage.image('floor')
+                 .appendTo(cube)
+                 .pin({textureAlpha: floorAlpha,
+                       scale: 1.1,
+                       offsetX: -7,
+                       offsetY: 138});
 
     for (let {row, column, depth} of coordinates()) {
         const position = cellPosition({row, column, depth});
@@ -112,48 +218,49 @@ Stage(function(stage) {
         // `cell` is the parent node of each cell, and represents the "hit box"
         // for selecting that cell.  Its descendants will be: the background
         // texture, the shadow, the digit, etc.
-        const cell = Stage.image('blank')
+        const cell = Stage.image('orange')
                           .appendTo(cube)
-                          .pin({width: 45, height: 16})
+                          .pin({width: hitboxWidth,
+                                height: hitboxHeight,
+                                textureAlpha: 0})
                           .stretch()
                           .pin(position)
                           .on(Mouse.CLICK, onClick(depth));
 
-        // TODO: trying out shadow.
-        // Here's how the cell position is calculated, as an offset from the
-        // top left of the cube:
-        //
-        //     offsetX: spacing * column + shear * depth,
-        //     offsetY: spacing * row    - shear * depth + spacing,
-        //     scale:   1 - perspective * depth
-        //
-        const heightScale = 1 - (2 - row) * 0.1;
-        const shadowPosition = {
-            // It's the scaling that's doing it!
-            // offsetY: cellPosition({row: 0, column, depth}).offsetY + spacing * (2 - row),
-            offsetY: spacing * (2 - row) + 0.5 * spacing,
-            offsetX: shear,
-            scaleY:  0.5 * heightScale * cellScale(depth),
-            scaleX:  heightScale * cellScale(depth)
-        };
+        cells.push(cell);
+
+        // shadows
+        const heightScale    = 1 - (2 - row) * 0.1;
+        const shadowPosition = cellPosition({row: 2, column, depth});
+        shadowPosition.offsetY += 0.4 * spacingY;
+
+        const shadowBox = Stage.image('red')
+                               .appendTo(cube)
+                               .pin({textureAlpha: 0})
+                               .pin(shadowPosition)
+                               .pin({width: hitboxWidth, height: hitboxHeight})
+                               .stretch();
+
+        shadows.push(shadowBox);
 
         Stage.image('shadow')
-             .appendTo(cell)
-             .pin(shadowPosition)
-             .pin({skewX: -1});
+             .appendTo(shadowBox)
+             .pin({scaleX: heightScale * cellScale(depth),
+                   scaleY: heightScale * cellScale(depth) / 2,
+                   align: 0.5,
+                   skewX: -1});
+
 
         // The visible part of the cell.
-        const cellFill = Stage.image('blue')
+        const cellFill = Stage.image('blue box')
                               .appendTo(cell)
                               .pin({scale: cellScale(depth),
-                                    pivot: 0.5,
-                                    alignX: 0.5,
-                                    alignY: 0.5});
+                                    align: 0.5});
 
         // The number inside of the visible part of the cell.
         Stage.string('digit')
              .appendTo(cellFill)
-             .pin({alignX: 0.4, alignY: 0.2, scale: 1.7, pivot: 0})
+             // .pin({align: 0.5})
              .value(Math.floor(Math.random() * 10));
     }
 });
