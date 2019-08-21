@@ -1,5 +1,5 @@
 {
-    "name": "Sidokudos",
+    "name": "Sudokudos",
     "short_name": "Sudokudos",
     "icons": [
         {
@@ -13,8 +13,7 @@
             "type": "image/png"
         }
     ],
-    "theme_color": "#ffffff",
-    "background_color": "#ffffff",
+    "background_color": "#d0d0d0",
     "display": "fullscreen",
     "orientation": "portrait"
 }

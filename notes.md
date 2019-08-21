@@ -1,9 +1,9 @@
 Possible name: "kasuba," from [this][translate] idea:
 
 - each plane must have all of the numbers
-- 各飛行機にはすべての番号が必要です
+- 各平面にはすべての番号が必要です
 - kaku hikōki ni wa subete no bangō ga hitsuyōdesu
-- **ka**ku hikōki ni wa **su**bete no **ba**ngō ga hitsuyōdesu
+- **ka**ku heimen ni wa **su**bete no **ba**ngō ga hitsuyōdesu
 - kasuba
 
 This kind of thing is how the name "sudoku" was derived initially, according to

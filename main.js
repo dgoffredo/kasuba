@@ -3,16 +3,36 @@ Stage(function(stage) {
 
     stage.viewbox(720 / 4, 1280 / 4);
 
-    const table = Stage.column().appendTo(stage).spacing(10);
+    const controlBox = Stage.column()
+                            .appendTo(stage)
+                            .pin({alignX: 1, offsetY: 10});
 
-    const controls = Stage.row().appendTo(table).spacing(10);
+    let controls;
 
-    let   cells   = [];
-    let   shadows = [];
+    Stage.image('menu')
+         .appendTo(controlBox)
+         .pin({'alignX': 1, offsetX: -10})
+         .on(Mouse.CLICK,
+             toggle(function () { controls.show(); },
+                    function () { controls.hide(); }));
+
+    controls = Stage.row()
+                    .appendTo(controlBox)
+                    .spacing(10);
+
+    controls.hide();
+
+    const editable = 'light box';
+    const preset   = 'blue box';
+    const selected = editable;
+    let   cells    = [];
+    let   shadows  = [];
     let   floor;
-    const floorAlpha = 0.1;
-    const hitboxWidth = 48;
-    const hitboxHeight = 16;
+    let   cube;
+    let   digitPicker;
+    let   digitHitboxes = [];
+    const cellHitboxWidth = 48;
+    const cellHitboxHeight = 16;
 
     function toggle(onEnable, onDisable, initial = false) {
         let state = initial;
@@ -38,7 +58,7 @@ Stage(function(stage) {
                                  },
                                  function () {
                                      cells.forEach(function (cell) {
-                                         cell.last().image('blue box');
+                                         cell.last().image(editable);
                                      });
                                      return true;
                                  }));
@@ -62,12 +82,10 @@ Stage(function(stage) {
          .appendTo(controls)
          .on(Mouse.CLICK, toggle(function () {
                                      shadows.forEach(invokeMethod('hide'));
-                                     floor.hide();
                                      return true;
                                  },
                                  function () {
                                      shadows.forEach(invokeMethod('show'));
-                                     floor.show();
                                      return true;
                                  }));
 
@@ -104,8 +122,34 @@ Stage(function(stage) {
     Stage.string('letter').value('F')
          .appendTo(controls)
          .on(Mouse.CLICK, 
-             toggle(function () { floor.pin({textureAlpha: 0}); },
-                    function () { floor.pin({textureAlpha: floorAlpha}); }));
+             toggle(function () { floor.show() },
+                    function () { floor.hide(); }));
+
+    Stage.string('digit').value(7)
+         .appendTo(controls)
+         .on(Mouse.CLICK,
+             toggle(function () {
+                        cube.pin({textureAlpha: 0.2});
+                        digitPicker.pin({textureAlpha: 0.2});
+                        digitHitboxes.forEach(function (hitbox) {
+                            hitbox.pin({textureAlpha: 0.8});
+                        });
+                    },
+                    function () {
+                        cube.pin({textureAlpha: 0});
+                        digitPicker.pin({textureAlpha: 0});
+                        digitHitboxes.forEach(function (hitbox) {
+                            hitbox.pin({textureAlpha: 0});
+                        });
+                    }));;
+
+    const table = Stage.column()
+                       .appendTo(stage)
+                       .spacing(2)
+                       .pin({alignX: 0.5,
+                             handleY: 1.0,
+                             alignY: 1,
+                             offsetY: -20});
 
     // Coordinates are row, column, and depth, each taking on any of the values
     // 0, 1, or 2.  Rows start at the top and go down.  Columns start on the
@@ -124,7 +168,7 @@ Stage(function(stage) {
     const spacingX    = spacing;
     const spacingY    = spacing;
     const shear       = 0.32 * spacing;
-    const perspective = 0.15;
+    const perspective = 0.1;
 
     function cellPosition({row, column, depth}) {
         return {
@@ -137,25 +181,29 @@ Stage(function(stage) {
         return 1 - perspective * depth;
     }
 
-    function scale(node, amount) {
-        const durationMs = 300;
+    function scale(node, scaleX, scaleY = scaleX) {
+        const durationMs = 250;
 
         return node.tween(durationMs)
-                   .scale(amount)
+                   .pin({scaleX, scaleY})
                    .ease('bounce-in');
     }
 
-    let selectedImage;
+    let selectedIndex;
 
-    function expand(image, amount) {
-        return scale(image.image('green box'), 1.5 * amount);
+    function heightScaling(row) {
+        return 1 - (2 - row) * 0.1;
     }
 
-    function shrink(image, amount) {
-        return scale(image.image('blue box'), amount);
+    function showDigitPicker() {
+        digitPicker.tween(500).pin({scaleX: 1}).ease('elastic');
     }
 
-    function onClick(depth) {
+    function hideDigitPicker() {
+        digitPicker.tween(200).pin({scaleX: 0}).ease('cubic');
+    }
+
+    function onClick(depth, row) {
         return function (point) {
             // `this` is the cell. We want to change the color and size of the
             // color texture containing the number. This is the cell's last
@@ -163,21 +211,53 @@ Stage(function(stage) {
             console.log(point);
             console.log(this);
 
-            const image = this.last();
-            console.log(image);
+            const depthScale    = cellScale(depth);
+            const heightScale   = heightScaling(row);
+            const magnification = 1.25;
 
-            const depthScale = cellScale(depth);
+            function expandCell(image) {
+                return scale(image.image(selected),
+                             magnification * depthScale);
+            }
 
-            if (selectedImage === image) {
-                shrink(image, depthScale);
-                selectedImage = undefined;
+            function shrinkCell(image) {
+                return scale(image.image(editable), depthScale);
+            }
+
+            function expandShadow(image) {
+                return scale(image,
+                             magnification * depthScale * heightScale,
+                             magnification * depthScale * heightScale * 0.5);
+            }
+
+            function shrinkShadow(image) {
+                return scale(image,
+                             depthScale * heightScale,
+                             depthScale * heightScale * 0.5);
+            }
+
+            const image  = this.last();
+            const index  = cells.indexOf(this);
+            const shadow = shadows[index].last();
+
+            if (selectedIndex === index) {
+                shrinkCell(image);
+                shrinkShadow(shadow);
+                selectedIndex = undefined;
+                hideDigitPicker();
             }
             else {
-                if (selectedImage !== undefined) {
-                    shrink(selectedImage, depthScale);
+                showDigitPicker();
+
+                if (selectedIndex !== undefined) {
+                    const selectedShadow = shadows[selectedIndex].last();
+                    shrinkCell(cells[selectedIndex].last());
+                    shrinkShadow(selectedShadow);
                 }
-                expand(image, depthScale);
-                selectedImage = image;
+
+                expandCell(image);
+                expandShadow(shadow);
+                selectedIndex = index;
             }
 
             return true;
@@ -197,20 +277,179 @@ Stage(function(stage) {
         }
     }
 
-    const cube = Stage.image('purple')
-                      .appendTo(table)
-                      .pin({align: 0.5,
-                            width: 175,
-                            height: 200,
-                            textureAlpha: 0})
-                      .stretch();
+    cube = Stage.image('purple')
+                .appendTo(table)
+                .pin({alignX: 0.5,
+                      width: 175,
+                      height: 190,
+                      textureAlpha: 0})
+                .stretch();
+
+    // digit picker
+    const digitPickerHeight = 28;
+
+    digitPicker = Stage.image('red')
+                       .appendTo(table)
+                       .pin({alignX: 0.5,
+                             width: 175,
+                             height: digitPickerHeight,
+                             textureAlpha: 0,
+                             scaleX: 0})  // invisible when not in use
+                       .stretch();
+    const digits = Stage.row()
+                        .appendTo(digitPicker)
+                        .spacing(1)
+                        .pin({alignX: 0.5});
+
+    let chosenDigit;
+
+    function scaleDigit(digit, {scale, alpha}) {
+        return digit.tween(60).pin({scale, alpha}).ease('quad-in');
+    }
+
+    let touchedMostRecent;
+    let dragging = false;
+    function onTouch() {
+        let toggledWhen = undefined;
+
+        return function (event) {
+            // console.log('touchy touchy:', event);
+    
+            if (event.type.endsWith('end') || event.type.endsWith('up')) {
+                dragging = false;
+                return true;
+            }
+    
+            if (event.type.endsWith('start') || event.type.endsWith('down')) {
+                dragging = true;
+            }
+            else if (!dragging && event.type !== 'click') {
+                return true;
+            }
+    
+            if (this === touchedMostRecent && event.type !== 'click') {
+                return true;
+            }
+    
+            touchedMostRecent = this;
+
+            const stickinessMs = 300;
+            const now = new Date();
+            if (toggledWhen && now - toggledWhen < stickinessMs) {
+                return true;
+            }
+
+            toggledWhen = now;
+    
+            if (this === chosenDigit) {
+                console.log('shrinking my number');
+                scaleDigit(this.last(), {scale: 1, alpha: 0.5});
+                chosenDigit = undefined;
+            }
+            else {
+                if (chosenDigit) {
+                    console.log('shrinking previous number');
+                    scaleDigit(chosenDigit.last(), {scale: 1, alpha: 0.5});
+                }
+                console.log('expanding my number');
+                scaleDigit(this.last(), {scale: 1.5, alpha: 0.7});
+                chosenDigit = this;
+            }
+            return true;
+        };
+    }
+   
+    Array.from('123456789').forEach(function (digit) {
+        const colors = ['blue', 'purple', 'red', 'orange', 'yellow', 'green'];
+        const digitHitbox =
+            Stage.image(colors[digit % 6])
+                 .appendTo(digits)
+                 .pin({height: digitPickerHeight, width: 16, textureAlpha: 0})
+                 .stretch()
+                 .on([Mouse.START, Mouse.MOVE, Mouse.END, Mouse.CLICK],
+                     onTouch());
+
+        digitHitboxes.push(digitHitbox);
+
+        // the digit itself (inside of the hitbox)
+        Stage.string('digit')
+             .appendTo(digitHitbox)
+             .value(digit)
+             .pin({alignX: 0.5, alignY: 0.3, alpha: 0.5});
+    });
+
+    // plane picker
+    /*
+    const planePicker = Stage.box()
+                             .appendTo(stage)
+                             .pin({alignX: 0.5,
+                                   alignY: 1,
+                                   handleY: 1,
+                                   // height: 40,
+                                   // width: 175,
+                                   textureAlpha: 0.5 });
+    */
+
+    function fadedImage(name) {
+        return Stage.image(name).pin({alpha: 0.5});
+    }
+
+    Stage.column().appendTo(table)
+                  .spacing(10)
+                  .pin({alignX: 0.5})
+                  .append([
+        Stage.row().spacing(20).append([
+            Stage.row().spacing(5).append([
+                fadedImage('depth0'),
+                Stage.image('depth1').pin({scale: 1.2}),
+                fadedImage('depth0'),
+            ]),
+            Stage.row().spacing(7).append(
+                ['depth1', 'depth0', 'depth1'].map(fadedImage)
+            )
+        ]),
+        Stage.row().spacing(20).append([
+            Stage.row().spacing(5).append(
+                ['depth1', 'depth0', 'depth1'].map(fadedImage)
+            ),
+            Stage.row().spacing(7).append(
+                ['depth0', 'depth1', 'depth0'].map(fadedImage)
+            )
+        ])
+    ]);
+
+    /*
+    <column>
+      <row>
+        <row><icon/><icon/><icon/></row>
+        <row><icon/><icon/><icon/></row>
+      </row>
+
+      <row>
+        <row><icon/><icon/><icon/></row>
+        <row><icon/><icon/><icon/></row>
+      </row>
+    </column>
+    */
+
+    /*
+    const pickerIcons = Stage.row()
+                             .appendTo(planePicker)
+                             .spacing(30)
+                             .pin({align: 0.5});
+ 
+    Stage.image('depth0').appendTo(pickerIcons);
+    Stage.image('depth1').appendTo(pickerIcons).pin({alpha: 0.5});
+    */
 
     floor = Stage.image('floor')
                  .appendTo(cube)
-                 .pin({textureAlpha: floorAlpha,
+                 .pin({textureAlpha: 0.1,
                        scale: 1.1,
                        offsetX: -7,
                        offsetY: 138});
+
+    floor.hide();
 
     for (let {row, column, depth} of coordinates()) {
         const position = cellPosition({row, column, depth});
@@ -220,17 +459,16 @@ Stage(function(stage) {
         // texture, the shadow, the digit, etc.
         const cell = Stage.image('orange')
                           .appendTo(cube)
-                          .pin({width: hitboxWidth,
-                                height: hitboxHeight,
+                          .pin({width: cellHitboxWidth,
+                                height: cellHitboxHeight,
                                 textureAlpha: 0})
                           .stretch()
                           .pin(position)
-                          .on(Mouse.CLICK, onClick(depth));
+                          .on(Mouse.CLICK, onClick(depth, row));
 
         cells.push(cell);
 
         // shadows
-        const heightScale    = 1 - (2 - row) * 0.1;
         const shadowPosition = cellPosition({row: 2, column, depth});
         shadowPosition.offsetY += 0.4 * spacingY;
 
@@ -238,29 +476,44 @@ Stage(function(stage) {
                                .appendTo(cube)
                                .pin({textureAlpha: 0})
                                .pin(shadowPosition)
-                               .pin({width: hitboxWidth, height: hitboxHeight})
+                               .pin({width: cellHitboxWidth,
+                                     height: cellHitboxHeight})
                                .stretch();
 
         shadows.push(shadowBox);
+
+        const heightScale = heightScaling(row);
 
         Stage.image('shadow')
              .appendTo(shadowBox)
              .pin({scaleX: heightScale * cellScale(depth),
                    scaleY: heightScale * cellScale(depth) / 2,
+                   textureAlpha: 0.1 + 0.4 * row / 2,  // from 0.1 to 0.5
                    align: 0.5,
                    skewX: -1});
 
+        // TODO: blah blah blah
+        const digitValue = Math.floor(Math.random() * 9 + 1);
+        let fillTexture;
+        if (digitValue < 4) {
+            fillTexture = editable;
+        }
+        // else if (digitValue === 9) {
+        //     fillTexture = 'red border box';  // just for flavor
+        // }
+        else {
+            fillTexture = preset;
+        }
 
         // The visible part of the cell.
-        const cellFill = Stage.image('blue box')
+        const cellFill = Stage.image(fillTexture)
                               .appendTo(cell)
                               .pin({scale: cellScale(depth),
                                     align: 0.5});
 
         // The number inside of the visible part of the cell.
-        Stage.string('digit')
-             .appendTo(cellFill)
-             // .pin({align: 0.5})
-             .value(Math.floor(Math.random() * 10));
+        const digit = Stage.string(digitValue < 4 ? 'digit' : 'digit')
+                           .appendTo(cellFill)
+                           .value(digitValue);
     }
 });
