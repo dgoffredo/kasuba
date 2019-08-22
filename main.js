@@ -360,7 +360,7 @@ Stage(function(stage) {
     }
    
     Array.from('123456789').forEach(function (digit) {
-        const colors = ['blue', 'purple', 'red', 'orange', 'yellow', 'green'];
+        const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple'];
         const digitHitbox =
             Stage.image(colors[digit % 6])
                  .appendTo(digits)
@@ -379,69 +379,31 @@ Stage(function(stage) {
     });
 
     // plane picker
-    /*
-    const planePicker = Stage.box()
-                             .appendTo(stage)
-                             .pin({alignX: 0.5,
-                                   alignY: 1,
-                                   handleY: 1,
-                                   // height: 40,
-                                   // width: 175,
-                                   textureAlpha: 0.5 });
-    */
-
-    function fadedImage(name) {
-        return Stage.image(name).pin({alpha: 0.5});
-    }
-
-    Stage.column().appendTo(table)
-                  .spacing(10)
-                  .pin({alignX: 0.5})
-                  .append([
-        Stage.row().spacing(20).append([
-            Stage.row().spacing(5).append([
-                fadedImage('depth0'),
-                Stage.image('depth1').pin({scale: 1.2}),
-                fadedImage('depth0'),
+    (function () {  // TODO, put these things in their own files (maybe)
+        const pick = picker({hitboxHeight: 24, hitboxWidth: 22});
+    
+        function plane(name) {
+            return pick(Stage.image(name).pin({alignX: 0.5, alignY: 0.33}));
+        }
+    
+        Stage.column().appendTo(table)
+                      .spacing(6)
+                      .pin({alignX: 0.5})
+                      .append([
+            Stage.row().spacing(10).append([
+                Stage.row().append(['depth1', 'depth0', 'depth1'].map(plane)),
+                Stage.row().append(['depth1', 'depth0', 'depth1'].map(plane))
             ]),
-            Stage.row().spacing(7).append(
-                ['depth1', 'depth0', 'depth1'].map(fadedImage)
-            )
-        ]),
-        Stage.row().spacing(20).append([
-            Stage.row().spacing(5).append(
-                ['depth1', 'depth0', 'depth1'].map(fadedImage)
-            ),
-            Stage.row().spacing(7).append(
-                ['depth0', 'depth1', 'depth0'].map(fadedImage)
-            )
-        ])
-    ]);
+            Stage.row().spacing(10).append([
+                Stage.row().append(['depth1', 'depth0', 'depth1'].map(plane)),
+                Stage.row().append(['depth0', 'depth1', 'depth0'].map(plane))
+            ])
+        ]);
+    // pick.showHitboxes();
+    }());
 
-    /*
-    <column>
-      <row>
-        <row><icon/><icon/><icon/></row>
-        <row><icon/><icon/><icon/></row>
-      </row>
 
-      <row>
-        <row><icon/><icon/><icon/></row>
-        <row><icon/><icon/><icon/></row>
-      </row>
-    </column>
-    */
-
-    /*
-    const pickerIcons = Stage.row()
-                             .appendTo(planePicker)
-                             .spacing(30)
-                             .pin({align: 0.5});
- 
-    Stage.image('depth0').appendTo(pickerIcons);
-    Stage.image('depth1').appendTo(pickerIcons).pin({alpha: 0.5});
-    */
-
+    // the floor (hidden by default)
     floor = Stage.image('floor')
                  .appendTo(cube)
                  .pin({textureAlpha: 0.1,
