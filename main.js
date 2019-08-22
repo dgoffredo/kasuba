@@ -30,7 +30,6 @@ Stage(function(stage) {
     let   floor;
     let   cube;
     let   digitPicker;
-    let   digitHitboxes = [];
     const cellHitboxWidth = 48;
     const cellHitboxHeight = 16;
 
@@ -130,17 +129,11 @@ Stage(function(stage) {
          .on(Mouse.CLICK,
              toggle(function () {
                         cube.pin({textureAlpha: 0.2});
-                        digitPicker.pin({textureAlpha: 0.2});
-                        digitHitboxes.forEach(function (hitbox) {
-                            hitbox.pin({textureAlpha: 0.8});
-                        });
+                        digitPicker.showHitboxes();
                     },
                     function () {
                         cube.pin({textureAlpha: 0});
-                        digitPicker.pin({textureAlpha: 0});
-                        digitHitboxes.forEach(function (hitbox) {
-                            hitbox.pin({textureAlpha: 0});
-                        });
+                        digitPicker.hideHitboxes();
                     }));;
 
     const table = Stage.column()
@@ -196,11 +189,11 @@ Stage(function(stage) {
     }
 
     function showDigitPicker() {
-        digitPicker.tween(500).pin({scaleX: 1}).ease('elastic');
+        digitPicker.container.tween(500).pin({scaleX: 1}).ease('elastic');
     }
 
     function hideDigitPicker() {
-        digitPicker.tween(200).pin({scaleX: 0}).ease('cubic');
+        digitPicker.container.tween(200).pin({scaleX: 0}).ease('cubic');
     }
 
     function onClick(depth, row) {
@@ -286,97 +279,40 @@ Stage(function(stage) {
                 .stretch();
 
     // digit picker
-    const digitPickerHeight = 28;
+    digitPicker = (function () {
+        const height    = 28,
+              container = Stage.image('red')
+                               .appendTo(table)
+                               .pin({alignX: 0.5,
+                                     width: 175,
+                                     height,
+                                     textureAlpha: 0,
+                                     scaleX: 0})  // invisible when not in use
+                               .stretch(),
+              pick      = picker({hitboxHeight: height,
+                                  hitboxWidth: 16,
+                                  magnification: 1.5,
+                                  selectedAlpha: 0.7,
+                                  deselectedAlpha: 0.5});
+                                    
+        Stage.row()
+             .appendTo(container)
+             .spacing(1)
+             .pin({alignX: 0.5})
+             .append(Array.from('123456789').map(function (digit) {
+                 return pick(Stage.string('digit')
+                                  .value(digit)
+                                  .pin({alignX: 0.5,
+                                        alignY: 0.3,
+                                        alpha: 0.5}));
+             }));
 
-    digitPicker = Stage.image('red')
-                       .appendTo(table)
-                       .pin({alignX: 0.5,
-                             width: 175,
-                             height: digitPickerHeight,
-                             textureAlpha: 0,
-                             scaleX: 0})  // invisible when not in use
-                       .stretch();
-    const digits = Stage.row()
-                        .appendTo(digitPicker)
-                        .spacing(1)
-                        .pin({alignX: 0.5});
-
-    let chosenDigit;
-
-    function scaleDigit(digit, {scale, alpha}) {
-        return digit.tween(60).pin({scale, alpha}).ease('quad-in');
-    }
-
-    let touchedMostRecent;
-    let dragging = false;
-    function onTouch() {
-        let toggledWhen = undefined;
-
-        return function (event) {
-            // console.log('touchy touchy:', event);
-    
-            if (event.type.endsWith('end') || event.type.endsWith('up')) {
-                dragging = false;
-                return true;
-            }
-    
-            if (event.type.endsWith('start') || event.type.endsWith('down')) {
-                dragging = true;
-            }
-            else if (!dragging && event.type !== 'click') {
-                return true;
-            }
-    
-            if (this === touchedMostRecent && event.type !== 'click') {
-                return true;
-            }
-    
-            touchedMostRecent = this;
-
-            const stickinessMs = 300;
-            const now = new Date();
-            if (toggledWhen && now - toggledWhen < stickinessMs) {
-                return true;
-            }
-
-            toggledWhen = now;
-    
-            if (this === chosenDigit) {
-                console.log('shrinking my number');
-                scaleDigit(this.last(), {scale: 1, alpha: 0.5});
-                chosenDigit = undefined;
-            }
-            else {
-                if (chosenDigit) {
-                    console.log('shrinking previous number');
-                    scaleDigit(chosenDigit.last(), {scale: 1, alpha: 0.5});
-                }
-                console.log('expanding my number');
-                scaleDigit(this.last(), {scale: 1.5, alpha: 0.7});
-                chosenDigit = this;
-            }
-            return true;
+        return {
+            container,
+            showHitboxes: pick.showHitboxes,
+            hideHitboxes: pick.hideHitboxes
         };
-    }
-   
-    Array.from('123456789').forEach(function (digit) {
-        const colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple'];
-        const digitHitbox =
-            Stage.image(colors[digit % 6])
-                 .appendTo(digits)
-                 .pin({height: digitPickerHeight, width: 16, textureAlpha: 0})
-                 .stretch()
-                 .on([Mouse.START, Mouse.MOVE, Mouse.END, Mouse.CLICK],
-                     onTouch());
-
-        digitHitboxes.push(digitHitbox);
-
-        // the digit itself (inside of the hitbox)
-        Stage.string('digit')
-             .appendTo(digitHitbox)
-             .value(digit)
-             .pin({alignX: 0.5, alignY: 0.3, alpha: 0.5});
-    });
+    }());
 
     // plane picker
     (function () {  // TODO, put these things in their own files (maybe)
@@ -399,7 +335,6 @@ Stage(function(stage) {
                 Stage.row().append(['depth0', 'depth1', 'depth0'].map(plane))
             ])
         ]);
-    // pick.showHitboxes();
     }());
 
 
@@ -409,9 +344,8 @@ Stage(function(stage) {
                  .pin({textureAlpha: 0.1,
                        scale: 1.1,
                        offsetX: -7,
-                       offsetY: 138});
-
-    floor.hide();
+                       offsetY: 138})
+                 .hide();
 
     for (let {row, column, depth} of coordinates()) {
         const position = cellPosition({row, column, depth});
@@ -474,8 +408,8 @@ Stage(function(stage) {
                                     align: 0.5});
 
         // The number inside of the visible part of the cell.
-        const digit = Stage.string(digitValue < 4 ? 'digit' : 'digit')
-                           .appendTo(cellFill)
-                           .value(digitValue);
+        Stage.string(digitValue < 4 ? 'digit' : 'digit')
+             .appendTo(cellFill)
+             .value(digitValue);
     }
 });
