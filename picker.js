@@ -1,5 +1,5 @@
 function picker({
-    magnification = 1.2,
+    magnification = 1.3,
     selectedAlpha = 1,
     deselectedAlpha = 0.5,
     hitboxHeight,
@@ -48,10 +48,12 @@ function select(key) {
 
     const {hitbox, onSelect} = hitboxes[key];
           scale              = magnification,
-          alpha              = selectedAlpha;
+          alpha              = selectedAlpha,
+          node               = hitbox.last();
 
-    selectedKey = key;  // TODO: consider interpreting result of `onSelect`
-    onSelect(hitbox.last().tween(60).pin({scale, alpha}).ease('quad-in'));
+    selectedKey = key;
+
+    onSelect(key, node.tween(60).pin({scale, alpha}).ease('quad-in'));
 }
 
 function deselect() {
@@ -61,11 +63,13 @@ function deselect() {
 
     const {hitbox, onDeselect} = hitboxes[selectedKey],
           scale                = 1,
-          alpha                = deselectedAlpha;
+          alpha                = deselectedAlpha,
+          key                  = selectedKey,
+          node                 = hitbox.last();
    
     selectedKey = undefined;
           
-    onDeselect(hitbox.last().tween(60).pin({scale, alpha}).ease('quad-in'));
+    onDeselect(key, node.tween(60).pin({scale, alpha}).ease('quad-in'));
 }
 
 function requireArgument(nameAndValue) {
