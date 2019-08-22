@@ -1,5 +1,5 @@
 Stage({
-    name: 'example',
+    name: 'assets',
     image: {src: 'assets/textures.png', ratio: 4},
     trim: 0.2,
     textures: {

@@ -9,12 +9,42 @@ Stage(function(stage) {
 
     let controls;
 
+    function $(id) {
+        return document.getElementById(id);
+    }
+
+    let menuDisabled = false;
+
     Stage.image('menu')
          .appendTo(controlBox)
-         .pin({'alignX': 1, offsetX: -10})
-         .on(Mouse.CLICK,
-             toggle(function () { controls.show(); },
-                    function () { controls.hide(); }));
+         .pin({'alignX': 1, offsetX: -17})
+         .on(Mouse.START, function () {
+             if (menuDisabled) {
+                 return;
+             }
+
+             $('menu').style.visibility = 'visible';
+             $('stage').style.opacity   = 0.5;
+             menuDisabled               = true;
+
+             console.log('registering first stop');
+             stage.on(Mouse.END, function handlerStop () {
+                 console.log('registering next start');
+                 stage.off(Mouse.END, handlerStop);
+                 stage.on(Mouse.START, function handlerStart() {
+                     $('menu').style.visibility = 'hidden';
+                     $('stage').style.opacity = 1;
+                     stage.off(Mouse.START, handlerStart);
+    
+                     console.log('registering next stop');
+                     stage.on(Mouse.END, function restore() {
+                         console.log('enabling menu clickability');
+                         menuDisabled = false;
+                         stage.off(Mouse.END, restore);
+                     });
+                 });
+             });
+         });
 
     controls = Stage.row()
                     .appendTo(controlBox)
@@ -30,8 +60,17 @@ Stage(function(stage) {
     let   floor;
     let   cube;
     let   digitPicker;
+    let   planePicker;
     const cellHitboxWidth = 48;
     const cellHitboxHeight = 16;
+
+    function showDigitPicker() {
+        digitPicker.container.tween(500).pin({scaleX: 1}).ease('elastic');
+    }
+
+    function hideDigitPicker() {
+        digitPicker.container.tween(200).pin({scaleX: 0}).ease('cubic');
+    }
 
     function toggle(onEnable, onDisable, initial = false) {
         let state = initial;
@@ -90,51 +129,38 @@ Stage(function(stage) {
 
     Stage.string('letter').value('D')
          .appendTo(controls)
-         .on(Mouse.CLICK, toggle(function () {
-                                     cells.forEach(function (cell) {
-                                         cell.pin({textureAlpha: 0.5});
-                                     });
-                                     return true;
-                                 },
-                                 function () {
-                                     cells.forEach(function (cell) {
-                                         cell.pin({textureAlpha: 0});
-                                     });
-                                     return true;
-                                }));
+         .on(Mouse.CLICK,
+             toggle(function () {
+                        cells.forEach(function (cell) {
+                            cell.pin({textureAlpha: 0.5});
+                        });
+                        shadows.forEach(function (cell) {
+                            cell.pin({textureAlpha: 0.3});
+                        });
+                        cube.pin({textureAlpha: 0.2});
+                        digitPicker.showHitboxes();
+                        planePicker.showHitboxes();
+                        showDigitPicker();
+                        return true;
+                    },
+                    function () {
+                        cells.forEach(function (cell) {
+                            cell.pin({textureAlpha: 0});
+                        });
+                        shadows.forEach(function (cell) {
+                            cell.pin({textureAlpha: 0});
+                        });
+                        cube.pin({textureAlpha: 0});
+                        digitPicker.hideHitboxes();
+                        planePicker.hideHitboxes();
+                        return true;
+                    }));
  
     Stage.string('letter').value('E')
-         .appendTo(controls)
-         .on(Mouse.CLICK, toggle(function () {
-                                     shadows.forEach(function (cell) {
-                                         cell.pin({textureAlpha: 0.3});
-                                     });
-                                     return true;
-                                 },
-                                 function () {
-                                     shadows.forEach(function (cell) {
-                                         cell.pin({textureAlpha: 0});
-                                     });
-                                     return true;
-                                }));
-                                
-    Stage.string('letter').value('F')
          .appendTo(controls)
          .on(Mouse.CLICK, 
              toggle(function () { floor.show() },
                     function () { floor.hide(); }));
-
-    Stage.string('digit').value(7)
-         .appendTo(controls)
-         .on(Mouse.CLICK,
-             toggle(function () {
-                        cube.pin({textureAlpha: 0.2});
-                        digitPicker.showHitboxes();
-                    },
-                    function () {
-                        cube.pin({textureAlpha: 0});
-                        digitPicker.hideHitboxes();
-                    }));;
 
     const table = Stage.column()
                        .appendTo(stage)
@@ -188,15 +214,8 @@ Stage(function(stage) {
         return 1 - (2 - row) * 0.1;
     }
 
-    function showDigitPicker() {
-        digitPicker.container.tween(500).pin({scaleX: 1}).ease('elastic');
-    }
-
-    function hideDigitPicker() {
-        digitPicker.container.tween(200).pin({scaleX: 0}).ease('cubic');
-    }
-
-    function onClick(depth, row) {
+    // TODO: hack hack hack
+    function onClick(depth, row, digitValue) {
         return function (point) {
             // `this` is the cell. We want to change the color and size of the
             // color texture containing the number. This is the cell's last
@@ -237,9 +256,17 @@ Stage(function(stage) {
                 shrinkCell(image);
                 shrinkShadow(shadow);
                 selectedIndex = undefined;
+                digitPicker.deselect();
                 hideDigitPicker();
             }
             else {
+                if (digitValue === 0) {
+                    digitPicker.deselect();
+                }
+                else {
+                    digitPicker.select(digitValue);
+                }
+
                 showDigitPicker();
 
                 if (selectedIndex !== undefined) {
@@ -300,22 +327,26 @@ Stage(function(stage) {
              .spacing(1)
              .pin({alignX: 0.5})
              .append(Array.from('123456789').map(function (digit) {
-                 return pick(Stage.string('digit')
-                                  .value(digit)
-                                  .pin({alignX: 0.5,
-                                        alignY: 0.3,
-                                        alpha: 0.5}));
+                 return pick({
+                     [digit]: Stage.string('digit')
+                                   .value(digit)
+                                   .pin({alignX: 0.5,
+                                         alignY: 0.3,
+                                         alpha: 0.5})
+                 });
              }));
 
         return {
             container,
             showHitboxes: pick.showHitboxes,
-            hideHitboxes: pick.hideHitboxes
+            hideHitboxes: pick.hideHitboxes,
+            select:       pick.select,
+            deselect:     pick.deselect
         };
     }());
 
     // plane picker
-    (function () {  // TODO, put these things in their own files (maybe)
+    planePicker = (function () {  // TODO, put in their own files (maybe)
         const pick = picker({hitboxHeight: 24, hitboxWidth: 22});
     
         function plane(name) {
@@ -336,6 +367,8 @@ Stage(function(stage) {
                 Stage.row().append(['depth2', 'depth1', 'depth0'].map(plane))
             ])
         ]);
+
+        return pick;
     }());
 
     // the floor (hidden by default)
@@ -350,6 +383,8 @@ Stage(function(stage) {
     for (let {row, column, depth} of coordinates()) {
         const position = cellPosition({row, column, depth});
         
+        const digitValue = Math.floor(Math.random() * 9 + 1);  // TODO: hack
+
         // `cell` is the parent node of each cell, and represents the "hit box"
         // for selecting that cell.  Its descendants will be: the background
         // texture, the shadow, the digit, etc.
@@ -360,7 +395,7 @@ Stage(function(stage) {
                                 textureAlpha: 0})
                           .stretch()
                           .pin(position)
-                          .on(Mouse.CLICK, onClick(depth, row));
+                          .on(Mouse.CLICK, onClick(depth, row, digitValue));
 
         cells.push(cell);
 
@@ -389,7 +424,6 @@ Stage(function(stage) {
                    skewX: -1});
 
         // TODO: blah blah blah
-        const digitValue = Math.floor(Math.random() * 9 + 1);
         let fillTexture;
         if (digitValue < 4) {
             fillTexture = editable;

@@ -2,7 +2,7 @@ Possible name: "kasuba," from [this][translate] idea:
 
 - each plane must have all of the numbers
 - 各平面にはすべての番号が必要です
-- kaku hikōki ni wa subete no bangō ga hitsuyōdesu
+- kaku heimen ni wa subete no bangō ga hitsuyōdesu
 - **ka**ku heimen ni wa **su**bete no **ba**ngō ga hitsuyōdesu
 - kasuba
 

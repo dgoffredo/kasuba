@@ -6,6 +6,7 @@
 #include <numeric>
 #include <ostream>
 #include <string>
+#include <unordered_set>
 // #include <vector>
 
 namespace {
@@ -35,6 +36,14 @@ struct Cube {
 
         return data[n*n*x + n*y + z];
     }
+
+    static void pointFromOffset(int offset, int& x, int& y, int& z) {
+        z = offset % n - 1;
+        offset /= n;
+        y = offset % n - 1;
+        offset /= n;
+        x = offset - 1;
+    }
 };
 
 /*
@@ -62,7 +71,17 @@ std::ostream& operator<<(std::ostream& stream, const Cube& cube) {
 }
 */
 
-bool invalid(const Cube& cube) {
+struct {
+    int xEqualsY = 0;
+    int xEqualsZ = 0;
+    int yEqualsZ = 0;
+} signs;
+
+bool invalid(const Cube& cube, int offset) {
+    // (pX, pY, pZ) is the point that changed most recently.
+    int pX, pY, pZ;
+    Cube::pointFromOffset(offset, pX, pY, pZ);
+
     std::array<int, n> range;
     std::iota(range.begin(), range.end(), -n/2);
 
@@ -73,53 +92,69 @@ bool invalid(const Cube& cube) {
     for (const int k : range) {
 
         // x = k
-        seen = empty;
-        for (const int y : range) {
-            for (const int z : range) {
-                const int value = cube(k, y, z);
-                if (value) {
-                    if (seen[value]) {
-                        // std::cout << "already saw " << value << " in x = "
-                        //           << k << " for y = " << y << " and z = " << z
-                        //           << "\n";
-                        return true;
-                    }
-                    else {
-                        seen[value] = true;
+        if (pX == k) {
+            seen = empty;
+            for (const int y : range) {
+                for (const int z : range) {
+                    const int value = cube(k, y, z);
+                    if (value) {
+                        if (seen[value]) {
+                            //           << "\n";
+                            return true;
+                        }
+                        else {
+                            seen[value] = true;
+                        }
                     }
                 }
             }
         }
 
         // y = k
-        seen = empty;
-        for (const int x : range) {
-            for (const int z : range) {
-                const int value = cube(x, k, z);
-                if (value) {
-                    if (seen[value]) {
-                        // std::cout << "already saw " << value << " in y = "
-                        //           << k << " for x = " << x << " and z = " << z
-                        //           << "\n";
-                        return true;
-                    }
-                    else {
-                        seen[value] = true;
+        if (pY == k) {
+            seen = empty;
+            for (const int x : range) {
+                for (const int z : range) {
+                    const int value = cube(x, k, z);
+                    if (value) {
+                        if (seen[value]) {
+                            return true;
+                        }
+                        else {
+                            seen[value] = true;
+                        }
                     }
                 }
             }
-        }
+            }
 
         // z = k
+        if (pZ == k) {
+            seen = empty;
+            for (const int x : range) {
+                for (const int y : range) {
+                    const int value = cube(x, y, k);
+                    if (value) {
+                        if (seen[value]) {
+                            return true;
+                        }
+                        else {
+                            seen[value] = true;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // x = +/- y
+    if (signs.xEqualsY && signs.xEqualsY * pX == pY) {
         seen = empty;
-        for (const int x : range) {
-            for (const int y : range) {
-                const int value = cube(x, y, k);
+        for (const int z : range) {
+            for (const int k : range) {
+                const int value = cube(signs.xEqualsY * k, k, z);
                 if (value) {
                     if (seen[value]) {
-                        // std::cout << "already saw " << value << " in z = "
-                        //           << k << " for x = " << x << " and y = " << y
-                        //           << "\n";
                         return true;
                     }
                     else {
@@ -130,51 +165,37 @@ bool invalid(const Cube& cube) {
         }
     }
 
-    /*
-    // x = -y
-    seen = empty;
-    for (const int z : range) {
-        for (const int k : range) {
-            const int value = cube(-k, k, z);
-            if (value) {
-                if (seen[value]) {
-                    return true;
-                }
-                else {
-                    seen[value] = true;
-                }
-            }
-        }
-    }
-    */
-
-    // y = -z
-    seen = empty;
-    for (const int x : range) {
-        for (const int k : range) {
-            const int value = cube(x, k, k);
-            if (value) {
-                if (seen[value]) {
-                    return true;
-                }
-                else {
-                    seen[value] = true;
+    // y = +/- z
+    if (signs.yEqualsZ && signs.yEqualsZ * pY == pZ) {
+        seen = empty;
+        for (const int x : range) {
+            for (const int k : range) {
+                const int value = cube(x, signs.yEqualsZ * k, k);
+                if (value) {
+                    if (seen[value]) {
+                        return true;
+                    }
+                    else {
+                        seen[value] = true;
+                    }
                 }
             }
         }
     }
 
-    // x = z
-    seen = empty;
-    for (const int y : range) {
-        for (const int k : range) {
-            const int value = cube(k, y, k);
-            if (value) {
-                if (seen[value]) {
-                    return true;
-                }
-                else {
-                    seen[value] = true;
+    // x = +/- z
+    if (signs.xEqualsZ && signs.xEqualsZ * pX == pZ) {
+        seen = empty;
+        for (const int y : range) {
+            for (const int k : range) {
+                const int value = cube(signs.xEqualsZ * k, y, k);
+                if (value) {
+                    if (seen[value]) {
+                        return true;
+                    }
+                    else {
+                        seen[value] = true;
+                    }
                 }
             }
         }
@@ -192,9 +213,19 @@ void handleInterrupt(int) {
 
 }  // namespace
 
-int main() {
+int main(int argc, char* argv[]) {
     std::signal(SIGINT, handleInterrupt);
     // std::vector<Cube> solutions;
+
+    const std::unordered_set<std::string> args(argv + 1, argv + argc);
+
+    // First, parse from the arguments which non-axis planes to require.
+    if (args.count("x=y")) signs.xEqualsY = 1;
+    if (args.count("x=-y")) signs.xEqualsY = -1;
+    if (args.count("x=z")) signs.xEqualsZ = 1;
+    if (args.count("x=-z")) signs.xEqualsZ = -1;
+    if (args.count("y=z")) signs.yEqualsZ = 1;
+    if (args.count("y=-z")) signs.yEqualsZ = -1;
 
     Cube cube;
     std::array<Int, n*n*n>& data = cube.data;
@@ -232,7 +263,8 @@ int main() {
                 ++data[i];
             }
         }
-        else if (data[i] == 0 || invalid(cube)) {
+        // TODO: deduce x, y, z
+        else if (data[i] == 0 || invalid(cube, i)) {
             // need to try the next number in this cell
             ++data[i];
         }
