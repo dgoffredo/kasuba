@@ -1,3 +1,4 @@
 [submodule "stage.js"]
 	path = stage.js
-	url = https://github.com/shakiba/stage.js.git
+	url = https://github.com/dgoffredo/stage.js.git
+    branch = always-full
