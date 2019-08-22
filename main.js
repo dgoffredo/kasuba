@@ -338,7 +338,6 @@ Stage(function(stage) {
         ]);
     }());
 
-
     // the floor (hidden by default)
     floor = Stage.image('floor')
                  .appendTo(cube)
