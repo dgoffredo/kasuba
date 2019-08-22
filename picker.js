@@ -62,7 +62,9 @@ function deselect() {
     const {hitbox, onDeselect} = hitboxes[selectedKey],
           scale                = 1,
           alpha                = deselectedAlpha;
-    
+   
+    selectedKey = undefined;
+          
     onDeselect(hitbox.last().tween(60).pin({scale, alpha}).ease('quad-in'));
 }
 
@@ -125,7 +127,6 @@ function add({key, node, options = {}}) {
         maybeToggle();
     }
 
-    console.log('creating a hitbox having the following color:', color);
     const Mouse  = Stage.Mouse,
           hitbox = Stage.image(color)
                         .pin({width, height, textureAlpha: 0})
@@ -142,17 +143,13 @@ function add({key, node, options = {}}) {
 }
 
 function showHitboxes() {
-    console.log('called showHitboxes. hitboxes:', hitboxes);
     Object.values(hitboxes).forEach(function (value) {
-        console.log('showing', value.hitbox);
         value.hitbox.pin({textureAlpha: 0.5});
     });
 }
 
 function hideHitboxes() {
-    console.log('called hideHitboxes. hitboxes: hitboxes');
     Object.values(hitboxes).forEach(function (value) {
-        console.log('hiding', value.hitbox);
         value.hitbox.pin({textureAlpha: 0});
     });
 }
