@@ -321,18 +321,19 @@ Stage(function(stage) {
         function plane(name) {
             return pick(Stage.image(name).pin({alignX: 0.5, alignY: 0.33}));
         }
-    
+   
         Stage.column().appendTo(table)
                       .spacing(6)
                       .pin({alignX: 0.5})
                       .append([
             Stage.row().spacing(10).append([
-                Stage.row().append(['depth1', 'depth0', 'depth1'].map(plane)),
-                Stage.row().append(['depth1', 'depth0', 'depth1'].map(plane))
+                Stage.row().append(['depth0', 'depth1', 'depth2'].map(plane)),
+                Stage.row().append(['column0', 'column1', 'column2'].map(plane))
             ]),
             Stage.row().spacing(10).append([
-                Stage.row().append(['depth1', 'depth0', 'depth1'].map(plane)),
-                Stage.row().append(['depth0', 'depth1', 'depth0'].map(plane))
+                Stage.row().append(['row2', 'row1', 'row0'].map(plane)),
+                // TODO: special planes, whatever they end up being
+                Stage.row().append(['depth2', 'depth1', 'depth0'].map(plane))
             ])
         ]);
     }());

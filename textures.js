@@ -98,6 +98,14 @@ Stage({
         },
 
         depth0: {x: 3 * 16, y: 176, width: 16, height: 16},
-        depth1: {x: 4 * 16, y: 176, width: 16, height: 16}
+        depth1: {x: 4 * 16, y: 176, width: 16, height: 16},
+        depth2: {x: 5 * 16, y: 176, width: 16, height: 16},
+        row2:   {x: 6 * 16, y: 176, width: 16, height: 16},
+        row1:   {x: 7 * 16, y: 176, width: 16, height: 16},
+        row0:   {x: 8 * 16, y: 176, width: 16, height: 16},
+
+        column0: {x: 0 * 16, y: 192, width: 16, height: 16},
+        column1: {x: 1 * 16, y: 192, width: 16, height: 16},
+        column2: {x: 2 * 16, y: 192, width: 16, height: 16}
     }
 });
