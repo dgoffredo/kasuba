@@ -46,6 +46,7 @@ Stage({
         "border box":     { x: 4 * 16, y: 32, width: 16, height: 16, top: 4, bottom: 4, left: 4, right: 4 },
         "red border box": { x: 5 * 16, y: 32, width: 16, height: 16, top: 4, bottom: 4, left: 4, right: 4 },
         "green box":      { x: 6 * 16, y: 32, width: 16, height: 16, top: 4, bottom: 4, left: 4, right: 4 },
+        "red box":        { x: 7 * 16, y: 32, width: 16, height: 16, top: 4, bottom: 4, left: 4, right: 4 },
 
         menu: { x: 9 * 16, y: 32, width: 16, height: 16 },
 

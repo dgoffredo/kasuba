@@ -34,9 +34,9 @@ function randomHex() {
     let number;
     do {
         number = Math.random();
-    } while (number === 0);  // avoid zero (want more digits)
+    } while (number === 0);  // avoid zero (want more digits); this is rare
 
-    return number.toString(16).slice(2);  // without the leading "0."
+    return number.toString(16).slice(2);  // hex, but without the leading "0."
 }
 
 function generateKey() {
@@ -72,14 +72,6 @@ function deselect() {
     onDeselect(key, node.tween(60).pin({scale, alpha}).ease('quad-in'));
 }
 
-function requireArgument(nameAndValue) {
-    const [[name, value]] = Object.entries(nameAndValue);
-
-    if (value === undefined) {
-        throw new Error(`missing required argument key: ${name}`);
-    }
-}
-
 function add({key, node, options = {}}) {
     if (key in hitboxes) {
         throw new Error(`picker already has a node with the key: ${key}`);
@@ -95,10 +87,12 @@ function add({key, node, options = {}}) {
           onDeselect  = options.onDeselect || defaultOnDeselect,
           color       = nextColor();
 
-    requireArgument({'hitboxWidth': width});
-    requireArgument({'hitboxHeight': hitboxHeight});
-    requireArgument({onSelect});
-    requireArgument({onDeselect});
+    requireArguments({
+        hitboxWidth: width,
+        hitboxHeight: height,
+        onSelect,
+        onDeselect
+    });
 
     let toggledWhen = undefined;  // to avoid spurious toggling on click
 

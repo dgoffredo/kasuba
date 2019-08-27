@@ -1,3 +1,7 @@
+var toggleShadows,
+    toggleFloor,
+    toggleHitboxes;
+
 Stage(function(stage) {
     const Mouse = Stage.Mouse;
 
@@ -18,7 +22,7 @@ Stage(function(stage) {
     Stage.image('menu')
          .appendTo(controlBox)
          .pin({'alignX': 1, offsetX: -17})
-         .on(Mouse.START, function () {
+         .on([Mouse.START, Mouse.END], function () {
              if (menuDisabled) {
                  return;
              }
@@ -33,7 +37,7 @@ Stage(function(stage) {
                  stage.off(Mouse.END, handlerStop);
                  stage.on(Mouse.START, function handlerStart() {
                      $('menu').style.visibility = 'hidden';
-                     $('stage').style.opacity = 1;
+                     $('stage').style.opacity   = 1;
                      stage.off(Mouse.START, handlerStart);
     
                      console.log('registering next stop');
@@ -54,7 +58,7 @@ Stage(function(stage) {
 
     const editable = 'light box';
     const preset   = 'blue box';
-    const selected = editable;
+    const selected = 'green box'; // editable;
     let   cells    = [];
     let   shadows  = [];
     let   floor;
@@ -116,21 +120,20 @@ Stage(function(stage) {
         };
     }
 
+    toggleShadows = toggle(function () {
+                               shadows.forEach(invokeMethod('hide'));
+                               return true;
+                           },
+                           function () {
+                               shadows.forEach(invokeMethod('show'));
+                               return true;
+                           });
+
     Stage.string('letter').value('C')
          .appendTo(controls)
-         .on(Mouse.CLICK, toggle(function () {
-                                     shadows.forEach(invokeMethod('hide'));
-                                     return true;
-                                 },
-                                 function () {
-                                     shadows.forEach(invokeMethod('show'));
-                                     return true;
-                                 }));
+         .on(Mouse.CLICK, toggleShadows);
 
-    Stage.string('letter').value('D')
-         .appendTo(controls)
-         .on(Mouse.CLICK,
-             toggle(function () {
+    toggleHitboxes = toggle(function () {
                         cells.forEach(function (cell) {
                             cell.pin({textureAlpha: 0.5});
                         });
@@ -154,13 +157,18 @@ Stage(function(stage) {
                         digitPicker.hideHitboxes();
                         planePicker.hideHitboxes();
                         return true;
-                    }));
- 
+                    });
+
+    Stage.string('letter').value('D')
+         .appendTo(controls)
+         .on(Mouse.CLICK, toggleHitboxes);
+
+    toggleFloor = toggle(function () { floor.show() },
+                         function () { floor.hide(); });
+                    
     Stage.string('letter').value('E')
          .appendTo(controls)
-         .on(Mouse.CLICK, 
-             toggle(function () { floor.show() },
-                    function () { floor.hide(); }));
+         .on(Mouse.CLICK, toggleFloor);
 
     const table = Stage.column()
                        .appendTo(stage)
@@ -187,9 +195,9 @@ Stage(function(stage) {
     const spacingX    = spacing;
     const spacingY    = spacing;
     const shear       = 0.32 * spacing;
-    const perspective = 0.1;
+    const perspective = 0.15; // 0.1;
 
-    function cellPosition({row, column, depth}) {
+    function defaultCellPosition({row, column, depth}) {
         return {
             offsetX: spacingX * column + shear * depth,
             offsetY: spacingY * row    - shear * depth + spacingY,
@@ -201,11 +209,11 @@ Stage(function(stage) {
     }
 
     function scale(node, scaleX, scaleY = scaleX) {
-        const durationMs = 250;
+        const durationMs = 500;
 
         return node.tween(durationMs)
                    .pin({scaleX, scaleY})
-                   .ease('bounce-in');
+                   .ease('elastic');
     }
 
     let selectedIndex;
@@ -225,7 +233,7 @@ Stage(function(stage) {
 
             const depthScale    = cellScale(depth);
             const heightScale   = heightScaling(row);
-            const magnification = 1.25;
+            const magnification = 1.3;
 
             function expandCell(image) {
                 return scale(image.image(selected),
@@ -297,13 +305,17 @@ Stage(function(stage) {
         }
     }
 
+    const swipe = swipeDetector();
+
     cube = Stage.image('purple')
                 .appendTo(table)
                 .pin({alignX: 0.5,
                       width: 175,
                       height: 190,
                       textureAlpha: 0})
-                .stretch();
+                .stretch()
+                .on(Mouse.START, swipe.onStart)
+                .on(Mouse.END,   swipe.onEnd);
 
     // digit picker
     digitPicker = (function () {
@@ -381,7 +393,7 @@ Stage(function(stage) {
                  .hide();
 
     for (let {row, column, depth} of coordinates()) {
-        const position = cellPosition({row, column, depth});
+        const position = defaultCellPosition({row, column, depth});
         
         const digitValue = Math.floor(Math.random() * 9 + 1);  // TODO: hack
 
@@ -400,7 +412,7 @@ Stage(function(stage) {
         cells.push(cell);
 
         // shadows
-        const shadowPosition = cellPosition({row: 2, column, depth});
+        const shadowPosition = defaultCellPosition({row: 2, column, depth});
         shadowPosition.offsetY += 0.4 * spacingY;
 
         const shadowBox = Stage.image('red')
@@ -440,6 +452,9 @@ Stage(function(stage) {
                               .appendTo(cell)
                               .pin({scale: cellScale(depth),
                                     align: 0.5});
+
+        // The cell border.
+        Stage.image('border box').appendTo(cellFill);
 
         // The number inside of the visible part of the cell.
         Stage.string(digitValue < 4 ? 'digit' : 'digit')

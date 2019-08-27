@@ -21,15 +21,14 @@
       content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0,
                minimum-scale=1.0, width=device-width, height=device-height" />
 
-<script src="stage.js/dist/stage.web.js"></script>
-
 </head>
+
 <body style="background: #e4c9af">
 
 <style>
 /* Let the parent of the canvas size itself based on the canvas's size. */
 #canvasWrap {
-    position:relative
+    position: relative
 }
 /* Place the menu near the menu button (which is part of the canvas). */
 #menu { 
@@ -38,17 +37,17 @@
     top: 7%; 
     right: 9%;
     width: 80%;
-    border-radius: 8vw;
-    font-size: 7vw;
+    border-radius: 8vmin;
+    font-size: 7vmin;
     font-family: 'Rubik', 'Roboto', 'Lato', 'Raleway', sans-serif;
-    background: #d0d0d0f8;
-    padding: 4vw;
+    background: #d0d0d0e0;
+    padding: 4vmin;
 }
 button {
-    border-radius: 3vw;
+    border-radius: 3vmin;
     border: 2px solid black;
     background-color: #5f8dd3;
-    font-size: 6vw;
+    font-size: 6vmin;
     font-weight: bold;
     font-family: 'Rubik', 'Roboto', 'Lato', 'Raleway', sans-serif;
 }
@@ -58,24 +57,17 @@ table {
 }
 th {
     text-align: left;
-    padding-top: 4vw;
+    padding-top: 4vmin;
 }
 #newGame {
-    margin-left: 13vw; /* separation from other button */
+    margin-left: 13vmin; /* separation from other button */
 }
 </style>
 
-<script>
-function refresh() {
-    const skipBrowserCache = true;
-    location.reload(skipBrowserCache);
-    return true;
-}
-</script>
-
 <div id="canvasWrap">
   <canvas id="stage"></canvas>
-  <div id="menu">
+  <form name="menu">
+    <div id="menu">
       <table>
         <tr><td>
           <button>Rules</button>
@@ -85,20 +77,26 @@ function refresh() {
         <tr><th>Show</tr></th>
 
         <tr><td>
-          <input type="checkbox" id="shadows" checked="true"/>
+          <input type="checkbox" id="shadows" checked="true"
+                 onclick="toggleShadows()"/>
           <label for="shadows">Shadows</label>
         </td><tr>
 
         <tr><td>
-          <input type="checkbox" id="floor"/>
+          <input type="checkbox" id="floor" onclick="toggleFloor()"/>
           <label for="floor">Floor</label>
+        </td><tr>
+        
+        <tr><td>
+          <input type="checkbox" id="hitboxes" onclick="toggleHitboxes()"/>
+          <label for="hitboxes">Hitboxes (debug)</label>
         </td><tr>
         
         <tr><th>Background Color</tr></th>
 
         <tr><td>
-          <input type="radio" id="cardboard" name="color" checked="true"/>
-          <label for="cardboard">Manila</label>
+          <input type="radio" id="manila" name="color" checked="true"/>
+          <label for="manila">Manila</label>
         </td></tr>
 
         <tr><td>
@@ -111,11 +109,16 @@ function refresh() {
           <label for="gray">Gray</label>
         </td></tr>
       </table>
-  </div>
+    </div>
+  </form>
 </div>
 
+<script src="stage.js/dist/stage.web.js"></script>
+<script src="menu.js"></script>
+<script src="common.js"></script>
 <script src="textures.js"></script>
 <script src="picker.js"></script>
+<script src="swipedetector.js"></script>
 <script src="main.js"></script>
 
 </body>
