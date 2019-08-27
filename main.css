@@ -1,0 +1,51 @@
+body {
+    background: #e4c9af;
+    overflow: hidden;  /* no scrolling if there's some extra at the margins */
+}
+/* Let the parent of the canvas size itself based on the canvas's size. */
+#canvasWrap {
+    position: relative
+}
+/* Place the menu near the menu button (which is part of the canvas). */
+#menu { 
+    visibility: hidden;
+    position: absolute; 
+    top: 7%; 
+    right: 9%;
+    width: 80%;
+    border-radius: 8vmin;
+    font-size: 6vmin;
+    font-family: 'Rubik', 'Roboto', 'Lato', 'Raleway', sans-serif;
+    background: #d0d0d0e0;
+    padding: 4vmin;
+}
+button {
+    border-radius: 3vmin;
+    border: 2px solid black;
+    background-color: #5f8dd3;
+    font-size: 5vmin;
+    font-weight: bold;
+    font-family: 'Rubik', 'Roboto', 'Lato', 'Raleway', sans-serif;
+}
+table {
+    /*margin-left: auto; */
+    margin-right: auto;
+}
+th {
+    text-align: left;
+    padding-top: 4vmin;
+}
+#rules {
+    position: absolute;
+    left: 4vmin;
+}
+#newGame {
+    position: absolute;
+    right: 4vmin;
+}
+#spacerRow {
+    height: 8vmin;
+}
+.rules {
+    display: none; /* the rules are shown by the "rules" button only */
+}
