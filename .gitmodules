@@ -1,0 +1,11 @@
+[submodule "stage.js"]
+	path = stage.js
+	url = https://github.com/dgoffredo/stage.js.git
+    branch = always-full
+[submodule "canvas-confetti"]
+	path = canvas-confetti
+	url = https://github.com/dgoffredo/canvas-confetti
+    branch = production
+[submodule "taml"]
+	path = taml
+	url = https://github.com/dgoffredo/taml.git

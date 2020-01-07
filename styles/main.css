@@ -1,0 +1,142 @@
+html {
+    /* https://stackoverflow.com/a/4407335 */
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+}
+body {
+    background: #e4c9af;
+    overflow: hidden;  /* no scrolling if there's some extra at the margins */
+    touch-action: none;
+}
+button:focus {
+    /* Game isn't handicapped accessible anyway (it's all canvas based). */
+    outline: none;
+    touch-action: none;
+}
+/* Let the parent of the canvas size itself based on the canvas's size. */
+#canvasWrap {
+    position: relative;
+    touch-action: none;
+}
+#title { 
+    visibility: hidden;
+    position: absolute; 
+    top: 2%;
+    width: 100%;
+    z-index: -1;
+    text-align: center;
+    font-size: 5vmin;
+    font-family: 'Rubik', 'Roboto', 'Lato', 'Raleway', sans-serif;
+    touch-action: none;
+}
+#menu { 
+    /* Place the menu near the menu button (which is part of the canvas). */
+    visibility: hidden;
+    position: absolute; 
+    top: 7%; 
+    right: 0.25vmin;
+    width: 90vmin;
+    border-radius: 8vmin;
+    font-size: 3.3vh;
+    font-family: 'Rubik', 'Roboto', 'Lato', 'Raleway', sans-serif;
+    background: rgba(224, 224, 224, 0.85);
+    padding: 4vmin;
+    touch-action: none;
+}
+p {
+    /* For whatever reason, the <p> text inside of the menu wasn't honoring the
+       menu's width, so I duplicate that constraint here. */
+    width: 80vmin;
+    touch-action: none;
+}
+.textbutton {
+    border-radius: 3vmin;
+    border: 2px solid black;
+    background: #5f8dd3;
+    font-size: 3.5vh;
+    font-weight: bold;
+    font-family: 'Rubik', 'Roboto', 'Lato', 'Raleway', sans-serif;
+    color: black;
+    touch-action: none;
+}
+.textbutton > svg {
+    vertical-align: middle;
+}
+.textbutton > img {
+    width: 1em;
+    height: 1em;
+    touch-action: none;
+}
+table {
+    margin-right: auto;
+    touch-action: none;
+}
+th {
+    text-align: left;
+    padding-top: 4vmin;
+    touch-action: none;
+}
+.spacerRow {
+    height: 4vmin;
+    touch-action: none;
+}
+.options {
+    display: none;
+    touch-action: none;
+}
+.rules {
+    display: none;
+    touch-action: none;
+}
+.about {
+    display: none;
+    touch-action: none;
+}
+.levelSelect {
+    display: none;
+    touch-action: none;
+}
+.survey {
+    display: none;
+    text-align: center;
+    touch-action: none;
+}
+.survey > th {
+    text-align: center;
+    touch-action: none;
+}
+.facebutton {
+    font-size: 10vmin;
+    background: none;
+    border: none;
+    font-family: 'Segoe UI';
+    touch-action: none;
+}
+.facebutton > img {
+    width: 12vmin;
+    height: 12vmin;
+    touch-action: none;
+}
+.faces {
+    white-space: nowrap;
+    touch-action: none;
+}
+.close {
+    background: none;
+    border: none;
+    touch-action: none;
+    position: absolute;
+    right: 4vmin;
+}
+.close > img {
+    width: 6vmin;
+    height: 6vmin;
+}
+.mainMenu {
+    display: none;
+}

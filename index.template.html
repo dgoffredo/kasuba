@@ -1,0 +1,184 @@
+<html>
+<head>
+
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<meta content="utf-8" http-equiv="encoding">
+<meta charset="utf-8"/>
+<meta name="Description"
+      content="Sudoku-like puzzle game in three dimensions"/>
+
+<title>Kasuba</title>
+
+<!-- start favicon -->
+<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png"/>
+<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png"/>
+<link rel="manifest" href="site.webmanifest"/>
+<link rel="mask-icon" href="favicon/safari-pinned-tab.svg" color="#e4c9af"/>
+<meta name="msapplication-TileColor" content="#e4c9af"/>
+<meta name="theme-color" content="#e4c9af"/>
+<!-- end favicon -->
+
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+
+<meta name="viewport"
+      content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0,
+               minimum-scale=1.0, width=device-width, height=device-height" />
+
+<link href="styles/main.css" rel="stylesheet"/> <!-- inlined by Makefile -->
+
+<!-- The stage.js library will load a PNG of "textures" dynamically.  This
+     "preload" directive might make loading the app faster, since the browser
+     can have (in parallel) already loaded the image when JS asks for it.  As
+     of this writing, Firefox does not support this, but I might as well. -->
+<link rel="preload" href="assets/textures.png" as="image"/>
+
+</head>
+
+<body>
+
+<div id="canvasWrap">
+  <div id="title">Level 1</div>
+  <canvas id="stage"></canvas>
+  <form id="menuForm" name="menu">
+    <div id="menu">
+      <div id="close">
+        <button class="close" onclick="Menu.hide()">
+          <img src="assets/close.svg"/> <!-- generated/inlined by Makefile -->
+        </button>
+      </div>
+
+      <table>
+
+        <tr class="back"><td>
+          <button class="textbutton" onclick="Menu.back()">
+            <img src="assets/back.svg"/>  <!-- generated/inlined by Makefile -->
+            Back
+        </td></tr>
+
+        <tr class="back spacerRow"><!-- Don't judge me! --></tr>
+
+        <tr class="mainMenu"><td>
+          <button class="textbutton" onclick="Menu.show('levelSelect')">New Game</button>
+        </td></tr>
+
+        <tr class="mainMenu spacerRow"><!-- Don't judge me! --></tr>
+
+        <tr class="mainMenu"><td>
+          <button class="textbutton" onclick="Menu.show('options')">Options</button>
+        </td></tr>
+
+        <tr class="mainMenu spacerRow"><!-- Don't judge me! --></tr>
+
+        <tr class="mainMenu"><td>
+          <button class="textbutton" onclick="Menu.show('rules')">Rules</button>
+        </td></tr>
+
+        <tr class="mainMenu spacerRow"><!-- Don't judge me! --></tr>
+
+        <tr class="mainMenu"><td>
+          <button class="textbutton" onclick="Menu.show('about')">About</button>
+        </td></tr>
+
+        <tr class="mainMenu spacerRow"><!-- Don't judge me! --></tr>
+
+        <!--
+        <tr class="mainMenu"><td>
+          <button class="textbutton" onclick="Menu.show('survey')">Survey</button>
+        </td></tr>
+        -->
+
+        <tr class="options"><th>Show</tr></th>
+
+        <tr class="options"><td>
+          <input type="checkbox" id="shadows" checked="true"
+                 onclick="Menu.pages.options.toggleShadows()"/>
+          <label for="shadows">Shadows</label>
+        </td><tr>
+
+        <tr class="options"><td>
+          <input type="checkbox" id="mistakes" checked="true"
+                 onclick="Menu.pages.options.toggleMistakes()"/>
+          <label for="mistakes">Mistakes in Red</label>
+        </td></tr>
+        
+        <tr class="options"><th>Background Color</tr></th>
+
+        <tr class="options"><td>
+          <input type="radio" id="manila" name="color" checked="true"/>
+          <label for="manila">Manila</label>
+        </td></tr>
+
+        <tr class="options"><td>
+          <input type="radio" id="antiqueWhite" name="color"/>
+          <label for="antiqueWhite">Antique White</label>
+        </td></tr>
+
+        <tr class="options"><td>
+          <input type="radio" id="gray" name="color"/>
+          <label for="gray">Gray</label>
+        </td></tr>
+
+        <tr class="rules"><th>Rules</th></tr>
+        <tr class="rules"><td>
+          <p>The boxes are arranged in a cube.</p>
+          <p>Fill the empty boxes with numbers such that each plane diagrammed
+             below contains each of the numbers 1 through 9 exactly once.</p>
+          <p>You can drag and swipe the cube.</p>
+        </td></tr>
+
+        <tr class="about"><th>Code</th></tr>
+        <tr class="about"><td>
+          <a href="https://github.com/dgoffredo/kasuba">
+            github.com/dgoffredo/kasuba
+          </a>
+        </td></tr>
+
+        <tr class="levelSelect"><th>Difficulty</th></tr>
+        <tr class="levelSelect"><td>
+          <button class="textbutton" onclick="Menu.pages.levelSelect.selectNewLevel(1)">Level 1</button>
+        </td></tr>
+        <tr class="levelSelect spacerRow"><!-- Don't judge me! --></tr>
+        <tr class="levelSelect spacerRow"><!-- Don't judge me! --></tr>
+        <tr class="levelSelect"><td>
+          <button class="textbutton" onclick="Menu.pages.levelSelect.selectNewLevel(2)">Level 2</button>
+        </td></tr>
+        <tr class="levelSelect spacerRow"><!-- Don't judge me! --></tr>
+        <tr class="levelSelect spacerRow"><!-- Don't judge me! --></tr>
+        <tr class="levelSelect"><td>
+          <button class="textbutton" onclick="Menu.pages.levelSelect.selectNewLevel(3)">Level 3</button>
+        </td></tr>
+        <tr class="levelSelect spacerRow"><!-- Don't judge me! --></tr>
+        <tr class="levelSelect spacerRow"><!-- Don't judge me! --></tr>
+        <tr class="levelSelect"><td>
+          <button class="textbutton" onclick="Menu.pages.levelSelect.selectNewLevel(4)">Level 4</button>
+        </td></tr>
+
+        <tr class="survey"><th>You win!</th></tr>
+        <tr class="survey spacerRow"><!-- Don't judge me! --></tr>
+        <tr class="survey"><td>How hard was that puzzle?</td></tr>
+        <tr class="survey faces"><td>
+          <button class="facebutton">🥱</button>
+          <button class="facebutton">🤨</button>
+          <button class="facebutton">🤔</button>
+          <button class="facebutton">😣</button>
+          <button class="facebutton">🤯</button>
+        </td></tr>
+
+      </table>
+    </div>
+  </form>
+</div>
+
+<script>const HITBOX_ALPHA = 0;</script>
+<script src="dist/kasuba.browser.js"></script> <!-- generated/inlined by Makefile -->
+<script>
+define.load().then(modules => {
+    // Assign globals used in the DOM.
+    Menu = modules['menu/menu'];
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,9 @@
+#!/bin/sh
+
+script_path="$1"
+
+printf "\n"
+printf "/* $script_path */\n"
+printf "\n"
+cat "$script_path"
+printf "\n"
