@@ -28,7 +28,12 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 if __name__ == '__main__':
     # I'm "whatever/kasuba/bin/server.py", and I want to cd to
-    # "whatever/kasuba".
-    repo = Path(sys.argv[0]).resolve().parent.parent
-    os.chdir(repo)
+    # "whatever/kasuba".  That is, unless an argument was passed specifying
+    # from where to serve files.
+    if len(sys.argv) > 1:
+        os.chdir(sys.argv[1])
+    else:
+        repo = Path(sys.argv[0]).resolve().parent.parent
+        os.chdir(repo)
+
     http.server.test(HandlerClass=MyHTTPRequestHandler)
