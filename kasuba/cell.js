@@ -1,3 +1,9 @@
+// A `Cell` instance is one of the twenty-seven number-holding elements within
+// the cube.  A cell can be blank or contain a number.  It can be "wrong"
+// (contains the incorrect number).  It can be selected or unselected.  It has
+// a shadow.
+// A `Cube` instance contains twenty-seven `Cell` instances.
+//
 define('cell', ['contracts'], function ({requireArguments}) {
 
 // Coordinates are row, column, and depth, each taking on any of the values

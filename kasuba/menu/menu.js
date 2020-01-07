@@ -1,3 +1,8 @@
+// This module represents the menu.  It controls the opening and closing of
+// the menu, and includes as dependencies all of the menu pages.  This module
+// has two-stage initialization.  After the module is instantiate by the
+// module loader, it must then have its `setup` method called exactly once.
+//
 define('menu/menu',
 ['graphics/dom', './about', './levelselect', './rules', './options', './survey'],
 function ({$class, $}, ...pageModules) {

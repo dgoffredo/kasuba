@@ -1,3 +1,6 @@
+// A `Cube` instance is the cube of numbered cells with which the user
+// interacts to play the game.
+//
 define('cube',
 [
     'cell',
@@ -293,7 +296,7 @@ function Cube({
 
     function setDigitOfSelected({digit}) {
         if (selectedCell === undefined) {
-            throw new Error(
+            throw Error(
                 `Can't setDigitOfSelected(${JSON.stringify({digit})}) ` +
                 `because there isn't currently a cell selected.`);
         }

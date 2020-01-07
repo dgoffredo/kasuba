@@ -1,3 +1,27 @@
+// Modern systems have fonts that will display Unicode emoji characters.
+// However, fonts differ in which emoji characters are supported.
+// The `menu/survey` module uses smiley faces to indicate puzzle difficulty
+// (e.g. a bored face for easy, and a frustrated face for hard).  A couple of
+// those emoji characters are relatively new, and so don't show on all systems
+// (as of this writing, only Windows supports them).  So, `GlyphDetector` uses
+// a canvas and some heuristics to determine whether a specified character can
+// be rendered.  If not, the calling code might choose a fallback image.
+//
+//     const renderable = GlyphDetector();
+//
+//     if (!renderable('☹️')) {
+//         // fallback image...
+//     }
+//
+// Note that each instance of `GlyphDetector` contains a canvas, so it's best
+// to instantiate only one instance and to reuse it.
+//
+// Why bother with this?  Just use the fallback images all the time, right?
+// No!  The truth is, I really like the Windows font, but it is NOT FOR SALE.
+// So, by doing this, at least the ones I like will be visible on Windows.
+// Elsewhere, some freely available SVGs in `assets/` are used instead.  That
+// is, basically everywhere.
+//
 define('graphics/glyphdetector', function () {
 
 // Thanks to Dan Hromada for the idea of how to detect whether a unicode code

@@ -1,11 +1,11 @@
-define('geometry/matrix', function () {
-
 // `Matrix` is not a class.  It's a namespace for functions.
 // According to these functions, a matrix is an array of rows, where each row
 // is an array of values.
 // You can, however, use `Matrix` as a function.  It simply returns its first
 // argument.
-    
+//   
+define('geometry/matrix', function () {
+
 function numRows(matrix) {
     return matrix.length;
 }
@@ -21,7 +21,7 @@ function multiply(left, right) {
           rightNumCols = numColumns(right);
 
     if (leftNumCols !== rightNumRows) {
-        throw new Error(
+        throw Error(
             `Cannot multiply a ${leftNumRows}x${leftNumCols} matrix by a ` +
             `${rightNumRows}x${rightNumCols} matrix, because the inner ` +
             `dimensions are not the same, i.e. ${leftNumCols} != ` +

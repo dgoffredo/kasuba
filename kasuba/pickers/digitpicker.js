@@ -1,3 +1,7 @@
+// The `DigitPicker` is the control that appears when an editable cell is
+// selected.  It allows the user to pick which number is in the cell.  It
+// uses `Picker` under the hood.
+//
 define('pickers/digitpicker', ['./picker', 'contracts'],
 function (Picker, {requireArguments}) {
 

@@ -1,3 +1,7 @@
+// This module catalogs all of the "planes" in the cube.  It's used by the
+// cube to highlight planes and to determine when there is a number duplicated
+// within a plane.
+//
 define('geometry/planes', function () {
 
 const transitions =

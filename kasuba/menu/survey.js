@@ -1,6 +1,7 @@
 // The "survey" is what is displayed when the player completes a puzzle.  They
-// can rate the difficulty of the puzzle.
-
+// can rate the difficulty of the puzzle.  This menu page is not listed in the
+// main menu.
+//
 define('menu/survey', ['graphics/dom', 'graphics/glyphdetector'],
 function ({$class}, GlyphDetector) {
 

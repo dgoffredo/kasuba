@@ -1,3 +1,6 @@
+// `tada()` plays a "tada!" sound and shoots confetti up from near the bottom
+// of the screen.  It's used when the user solves a puzzle.
+//
 define('tada', function () {
 
 const tada = (function () {

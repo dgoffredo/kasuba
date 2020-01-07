@@ -1,3 +1,7 @@
+// This module is the root of the module dependency tree.  It is the main
+// `stage.js` UI entity (it "owns" the viewbox).  It contains the cube, the
+// plane picker, the number picker, and the menu buttons.
+//
 define('main',
 ['cube', 'pickers/digitpicker', 'pickers/planepicker', 'puzzles', 'graphics/dom'],
 function (Cube, DigitPicker, PlanePicker, Puzzles, {$}) {

@@ -1,3 +1,7 @@
+// The `PlanePicker` is a table of icons that allow the user to select which
+// (if any) plane of cells is highlighted in the cube.  It uses `PlanePicker`
+// under the hood.
+//
 define('pickers/planepicker', ['./picker', 'geometry/planes', 'contracts'],
 function (Picker, Planes, {requireArguments}) {
     

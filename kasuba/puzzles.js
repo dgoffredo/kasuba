@@ -1,3 +1,6 @@
+// This module contains all of the puzzles that might be played, broken down
+// by difficulty level.
+//
 define('puzzles', function () {
 
 function toDigits(puzzle) {

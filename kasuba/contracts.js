@@ -1,3 +1,5 @@
+// This module contains functions for enforcing function contracts at runtime.
+//
 define('contracts', function () {
 
 function requireArguments(byName) {
@@ -8,7 +10,7 @@ function requireArguments(byName) {
 
     if (missing.length > 0) {
         const plurality = missing.length === 1 ? '' : 's';
-        throw new Error(`missing required argument key${plurality}: ${name}`);
+        throw Error(`missing required argument key${plurality}: ${name}`);
     }
 }
 

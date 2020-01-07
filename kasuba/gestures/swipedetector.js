@@ -1,3 +1,11 @@
+// A `SwipeDetector` contains the state to keep track of when a pointer is
+// placed down, flicked across the screen, and then released elsewhere a short
+// (but not too short) time later.  Swiping is used to flip the cube.
+//
+// `SwipeDetector` doesn't register itself as an event handler.  It's just a
+// state machine.  The caller must register its methods as event handlers as
+// appropriate.
+//
 define('gestures/swipedetector', function () {
 
 function SwipeDetector ({

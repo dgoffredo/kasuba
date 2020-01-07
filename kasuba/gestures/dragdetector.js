@@ -1,3 +1,12 @@
+// A `DragDetector` instance contains the state to keep track of when a
+// pointer is placed down, moved around, and then lifted back up.
+// Dragging is used to "rotate" the cube slightly.  This is distinct from
+// the "swipe" gesture (see `gestures/swipe`) used to flip the cube.
+//
+// `DragDetector` doesn't register itself as an event handler.  It's just a
+// state machine.  The caller must register its methods as event handlers as
+// appropriate.
+//
 define('gestures/dragdetector', function () {
 
 function DragDetector({

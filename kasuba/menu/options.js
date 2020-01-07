@@ -1,3 +1,5 @@
+// This menu page exposes settings that the user can modify.
+//
 define('menu/options', ['./functionref'], function (FunctionRef) {
 
 const toggleShadows = FunctionRef(),

@@ -1,3 +1,7 @@
+// This module defines a set of textures for use in the `stage.js` canvas
+// library.  Modules that use `stage.js`, such as `cell`, refer to the named
+// elements of "textures" when specifying UI elements in `stage.js`.
+//
 define('graphics/textures', function () {
 
 Stage({

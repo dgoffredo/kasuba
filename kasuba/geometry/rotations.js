@@ -1,3 +1,6 @@
+// This module contains functions that do the math of rotating a cube.  It's
+// used by the cube to do flips.
+//
 define('geometry/rotations', ['./matrix'], function (Matrix) {
 
 // These rotations use a different coordinate system than the cube.  The cube

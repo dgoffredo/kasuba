@@ -10,7 +10,12 @@
 //         initialize: newLevel.install,
 //         newLevel:   newLevel.invoke
 //     };
-
+//
+// `FunctionRef` is used by menu pages that need to expose in their interface
+// functionality that's not available until `setup` is called.  `FunctionRef`
+// encapsulates the pattern of having a level of indirection into which an
+// implementation can be later injected.
+//
 define('menu/functionref', function () {
 
 function FunctionRef() {

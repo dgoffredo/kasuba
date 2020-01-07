@@ -1,3 +1,14 @@
+// `Picker` returns a function that can be invoked with Stage objects to add
+// them to a set of selections sort of like radio buttons.  Then when one of
+// the objects is touched or clicked, it will be "selected," which will cause
+// it to be opaque and slightly magnified.  Unselected objects willi be
+// slightly translucent.
+// `Picker` is used to define two more specific selection widgets:
+// - the `PlanePicker`, which allows the user to select a plane in the cube to
+//   be highlighted,
+// - the `DigitPicker`, which allows the user to pick a number for a cell in
+//   the cube.
+//
 define('pickers/picker', ['contracts'], function ({requireArguments}) {
 
 function Picker({
@@ -85,7 +96,7 @@ function deselect({fireEvent = true} = {}) {
 
 function add({key, node, options = {}}) {
     if (key in hitboxes) {
-        throw new Error(`picker already has a node with the key: ${key}`);
+        throw Error(`picker already has a node with the key: ${key}`);
     }
 
     if (key === undefined) {
