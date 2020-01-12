@@ -1,9 +1,12 @@
 
+#include "randomint.h"
+
 #include <algorithm>
 #include <cassert>
 #include <cstddef>
 #include <iostream>
 #include <string>
+#include <vector>
 
 bool similar(const std::string& from, const std::string& to) {
     const std::size_t n = 27u;
@@ -24,7 +27,7 @@ bool similar(const std::string& from, const std::string& to) {
         after = to[i];
     }    
 
-    std::cout.write(transitions, sizeof transitions) << "\n";
+    // std::cout.write(transitions, sizeof transitions) << "\n";
     return true;
 }
 
@@ -36,7 +39,7 @@ void check(const std::string& from, const std::string& to) {
     std::cout << from << "\n" << to << "\n\n";
 }
 
-int main() {
+int oneAtATime() {
     std::string from, to;
 
     std::getline(std::cin, from);
@@ -47,5 +50,41 @@ int main() {
     while (std::getline(std::cin, from)) {
         swap(from, to);
         check(from, to);
+    }
+
+    return 0;
+}
+
+int randomly() {
+    std::vector<std::string> solutions;
+    solutions.reserve(9*8*7*6*5*4*3*2);
+
+    std::string line;
+    while (std::getline(std::cin, line)) {
+        solutions.push_back(line);
+    }
+
+    // any valid index into `solutions`
+    RandomInt rand(0, solutions.size() - 1);
+
+    for (;;) {
+        const int from = rand();
+        int to;
+        do {
+            to = rand();
+        } while (to == from);
+
+        check(solutions[from], solutions[to]);
+    }
+
+    return 0;
+}
+
+int main(int argc, char* argv[]) {
+    if (argc > 1 && std::string(argv[1]) == "random") {
+        return randomly();
+    }
+    else {
+        return oneAtATime();
     }
 }

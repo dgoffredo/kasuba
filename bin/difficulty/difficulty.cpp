@@ -272,6 +272,11 @@ std::vector<ConstraintCategory> makeConstraintCategories() {
         {wrap(&multipleAxisPlanes),                 3},
         {wrap(&axisPlanesAndOneSlantedPlane),       4},
         {wrap(&axisPlanesAndMultipleSlantedPlanes), 5}
+        // TODO: Some notion of "5 could be Here or There in this plane.
+        //       Suppose it were Here.  Then there can be no 5 in some other
+        //       plane.  Therefore 5 must go There rather than Here."
+        //
+        // I wonder if then this is a sufficient strategy.
     };
 }
 
