@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e  # bail if any command returns a nonzero status code
+
+make release.tar.gz
+scp -P 2022 release.tar.gz david@192.168.1.29:/home/david
+
+COMMAND='cd /home/david; ./install.sh'
+
+ssh -p 2022 david@192.168.1.29 "$COMMAND"
