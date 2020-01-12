@@ -4,11 +4,4 @@ for args in "x=y x=z" "x=y x=-z" "x=-y x=z" "x=-y x=-z" \
 do 
   echo "$args" >> "$args"
   ./solver $args >> "$args" &
-donefor args in "x=y x=z" "x=y x=-z" "x=-y x=z" "x=-y x=-z" \
-            "x=y y=z" "x=y y=-z" "x=-y y=z" "x=-y y=-z" \
-            "x=z y=z" "x=z y=-z" "x=-z y=z" "x=-z y=-z";
-do 
-  echo "$args" >> "$args"
-  ./solver $args >> "$args" &
 done
-
