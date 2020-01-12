@@ -3,6 +3,8 @@
 //
 define('puzzles', function () {
 
+// Convert the string representation of `puzzle` into an object mapping triples
+// to digits.
 function toDigits(puzzle) {
     let result = {},
              i = 0;

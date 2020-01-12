@@ -2,9 +2,15 @@
 // `stage.js` UI entity (it "owns" the viewbox).  It contains the cube, the
 // plane picker, the number picker, and the menu buttons.
 //
-define('main',
-['cube', 'pickers/digitpicker', 'pickers/planepicker', 'puzzles', 'graphics/dom'],
-function (Cube, DigitPicker, PlanePicker, Puzzles, {$}) {
+define('main', [
+    'cube', 
+    'pickers/digitpicker', 
+    'pickers/planepicker', 
+    'puzzles', 
+    'graphics/dom',
+    'tada'
+],
+function (Cube, DigitPicker, PlanePicker, Puzzles, {$}, {tada}) {
 
 Stage(function(stage) {
     stage.viewbox(720 / 4, 1280 / 4);
@@ -68,21 +74,25 @@ Stage(function(stage) {
                  onSelect:   onSelectCell,
                  onDeselect: onDeselectCell});
 
-    function newLevel (level) {
+    function newLevel(level) {
+        return reset({level, digits: Puzzles.random(level)});
+    };
+
+    function reset({level, digits}) {
         // Hide the title. The new level number will appear after an animation.
         const title = $('title');
         title.style.visibility = 'hidden';
 
         // Reset the cube with a randomly selected puzzle of `level`.
         cube.reset({
-            digits: Puzzles.random(level),
+            digits,
             onDone: function () {
                 currentLevel = level;
                 title.innerText = 'Level ' + currentLevel;
                 title.style.visibility = 'visible';
             }
         });
-    };
+    }
 
     digitPicker = DigitPicker({parent: table,
                                onSelect: onSelectDigit,
@@ -92,19 +102,17 @@ Stage(function(stage) {
                                onSelect: onSelectPlane,
                                onDeselect: onDeselectPlane});
 
-    function toggleMistakes() {
-        cube.toggleMistakes();
-    }
-
     Menu.setup({stage}, {
         options: {
             toggleShadows: cube.toggleShadows,
-            toggleMistakes: toggleMistakes
+            toggleMistakes: cube.toggleMistakes
         },
         levelSelect: {
             selectNewLevel: newLevel
         }
     });
+
+    // Do the opening cube flip animation.
 
     // `Stage.tween` considers a duration of zero to mean "use the default
     // duration."  So, to get real zero-like behavior, use a tiny duration.
