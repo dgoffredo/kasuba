@@ -2,8 +2,8 @@
 // selected.  It allows the user to pick which number is in the cell.  It
 // uses `Picker` under the hood.
 //
-define('pickers/digitpicker', ['./picker', 'contracts'],
-function (Picker, {requireArguments}) {
+define('pickers/digitpicker', ['./picker', 'contracts', 'keyboard'],
+function (Picker, {requireArguments}, Keyboard) {
 
 function DigitPicker({
     parent,
@@ -82,6 +82,22 @@ function DigitPicker({
             pick.select(args);
         }
     }
+
+    // If we're showing, then interpret digit keypresses as number selections,
+    // and backspace as "clear."
+    [1, 2, 3, 4, 5, 6, 7, 8, 9].forEach(digit => {
+        Keyboard.on('Digit' +  digit, () => {
+            if (showing) {
+                select({key: digit});
+            }
+        });
+    });
+
+    Keyboard.on('Backspace', () => {
+        if (showing) {
+            select({key: 0});
+        }
+    });
 
     return {
         container,
