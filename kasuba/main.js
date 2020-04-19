@@ -12,6 +12,9 @@ define('main', [
 ],
 function (Cube, DigitPicker, PlanePicker, Puzzles, {$}, {tada}) {
 
+// The execution of this module causes a "stage" to be created (in the stage.js
+// framework).  This is how this module is "main."  It's the first module to
+// actually do something when the page loads.
 Stage(function(stage) {
     stage.viewbox(720 / 4, 1280 / 4);
 

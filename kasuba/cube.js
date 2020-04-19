@@ -9,9 +9,10 @@ define('cube',
     'geometry/planes',
     'geometry/matrix',
     'geometry/rotations',
-    'contracts'
+    'contracts',
+    'keyboard'
 ],
-function (Cell, DragDetector, SwipeDetector, Planes, Matrix, Rotations, {requireArguments}) {
+function (Cell, DragDetector, SwipeDetector, Planes, Matrix, Rotations, {requireArguments}, Keyboard) {
 
 function Cube({
     parent,
@@ -128,6 +129,14 @@ function Cube({
 
         onFlip({direction});
     }
+
+    // Arrow keys flip the cube.
+    ['Up', 'Down', 'Left', 'Right'].forEach(suffix => {
+        Keyboard.on('Arrow' + suffix, code => {
+            const direction = code.slice('Arrow'.length).toLowerCase();
+            flip(direction);
+        });
+    });
 
     // This bool is used to prevent drag gestures from happening when a
     // "new level" animation is playing.  The animations of dragging and flying
