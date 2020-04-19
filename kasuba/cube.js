@@ -303,6 +303,14 @@ function Cube({
         onDeselect();
     }
 
+    // The escape key deselects the selected cell.
+    Keyboard.on('Escape', () => {
+        if (selectedCell !== undefined) {
+            selectedCell.deselect();
+            onDeselectCell();
+        }
+    });
+
     function setDigitOfSelected({digit}) {
         if (selectedCell === undefined) {
             throw Error(
